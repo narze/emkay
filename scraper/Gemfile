@@ -1,0 +1,7 @@
+# frozen_string_literal: true
+
+source "https://rubygems.org"
+
+gem 'debug'
+gem 'playwright-ruby-client', require: "playwright"
+gem 'rubocop'
