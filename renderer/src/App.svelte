@@ -5,8 +5,16 @@
   import bg from "./assets/bg.png"
   import data from "../../scraper/data.json"
   import format from "date-fns/format"
+  import formatDistance from "date-fns/formatDistance"
 
-  const { acc_points, card_number, expire_date, name, today_points } = data
+  const {
+    acc_points,
+    card_number,
+    expire_date,
+    name,
+    today_points,
+    updated_at,
+  } = data
 
   const expire_date_display = format(new Date(expire_date), "dd/MM/yyyy")
   const progress = Math.min(Math.round((acc_points / 1200) * 100), 100)
@@ -382,15 +390,20 @@
           </div>
         </div>
       </div>
-      <div class="d-flex justify-content-center mt-2">
-        <div class="social">
-          <i class="fab fa-facebook fa-2x" />
-          <i class="fab fa-instagram-square fa-2x" />
-          <i class="fab fa-youtube-square fa-2x" />
-        </div>
-      </div>
-      <div class="d-flex justify-content-center footer-font mt-2">
-        <span>© 2019 MK Restaurants Group PCL., All rights reserved.</span>
+      <div class="d-flex justify-content-center mt-2 gap-2 text-muted">
+        <span
+          ><a
+            href="https://github.com/narze/emkay/blob/main/scraper/data.json"
+            class="text-muted">data.json</a
+          >
+          updated at {format(new Date(updated_at), "HH:mm dd/MM/yyyy")} ({formatDistance(
+            new Date(updated_at),
+            new Date(),
+            {
+              addSuffix: true,
+            }
+          )})</span
+        >
       </div>
     </div>
   </footer>
