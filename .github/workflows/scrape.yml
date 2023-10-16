@@ -38,6 +38,8 @@ jobs:
         run: ruby main.rb
 
       - name: Commit and push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git diff
           git config --global user.email "notbarze@users.noreply.github.com"
