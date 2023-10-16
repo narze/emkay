@@ -4,8 +4,12 @@
   import Card from "./lib/Card.svelte"
   import bg from "./assets/bg.png"
   import data from "../../scraper/data.json"
+  import format from "date-fns/format"
 
   const { acc_points, card_number, expire_date, name, today_points } = data
+
+  const expire_date_display = format(new Date(expire_date), "dd/MM/yyyy")
+  const progress = Math.min(Math.round((acc_points / 1200) * 100), 100)
 </script>
 
 <main class="stretched bg-white">
@@ -183,12 +187,12 @@
                                 <div
                                   class="progress-bar bg-danger"
                                   role="progressbar"
-                                  style="width: 77%;"
-                                  aria-valuenow="77"
+                                  style={`width: ${progress}%;`}
+                                  aria-valuenow={progress}
                                   aria-valuemin="0"
                                   aria-valuemax="100"
                                 >
-                                  77%
+                                  {progress}%
                                 </div>
                               </div>
                             </div>
@@ -209,7 +213,7 @@
                             >/1,200 คะแนน
                           </div>
                           <span style="font-size: 10px;">
-                            สะสมภายใน {expire_date}</span
+                            สะสมภายใน {expire_date_display}</span
                           >
                         </div>
                         <div class="row d-flex justify-content-center">
@@ -246,7 +250,7 @@
                             </div>
                             <div style="margin-left:8px;">
                               บัตรสมาชิกหมดอายุ: <span class="txt-red">
-                                {expire_date}
+                                {expire_date_display}
                               </span>
                             </div>
                             <div style="margin-left:8px;">
