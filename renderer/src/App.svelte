@@ -10,6 +10,10 @@
 
   const expire_date_display = format(new Date(expire_date), "dd/MM/yyyy")
   const progress = Math.min(Math.round((acc_points / 1200) * 100), 100)
+
+  function showData() {
+    alert(JSON.stringify(data, null, 2))
+  }
 </script>
 
 <main class="stretched bg-white">
@@ -285,8 +289,7 @@
                           <button
                             class="btn btn-back history"
                             style="margin-right: 5px;"
-                            id="btn-history"
-                            value="5721122"
+                            on:click={showData}
                           >
                             ประวัติการใช้งาน
                           </button>
