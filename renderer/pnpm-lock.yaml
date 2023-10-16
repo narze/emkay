@@ -1,4 +1,4 @@
-lockfileVersion: '6.1'
+lockfileVersion: '6.0'
 
 settings:
   autoInstallPeers: true
@@ -11,6 +11,9 @@ devDependencies:
   '@tsconfig/svelte':
     specifier: ^5.0.0
     version: 5.0.0
+  canvas-circular-countdown:
+    specifier: ^1.8.0
+    version: 1.8.0
   svelte:
     specifier: ^4.0.5
     version: 4.0.5
@@ -390,6 +393,10 @@ packages:
   /callsites@3.1.0:
     resolution: {integrity: sha512-P8BjAsXvZS+VIDUI11hHCQEv74YT67YUi5JJFNWIqL235sBmjX4+qx9Muvls5ivyNENctx46xQLQ3aTuE7ssaQ==}
     engines: {node: '>=6'}
+    dev: true
+
+  /canvas-circular-countdown@1.8.0:
+    resolution: {integrity: sha512-LKZCfTdp3qkC6VqBt2lBfEYf/xGuPGn6aHcIKp9sIVE1DD0GPVFcnsd+EUJrZ4V79Y//aJ2fKqfASag8ZfJDSg==}
     dev: true
 
   /chokidar@3.5.3:

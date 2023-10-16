@@ -2,10 +2,98 @@
   import cardBlack from "../assets/card_black.jpg"
   import cardBackside from "../assets/card_backside.png"
   import duckJump from "../assets/duck_jump.gif"
+  import CanvasCircularCountdown from "canvas-circular-countdown"
+  import { onMount } from "svelte"
+
+  let countdown: HTMLElement
 
   function flip() {
     const card = document.querySelector(".flip-card")
     card.classList.toggle("flipped")
+  }
+
+  //             function clockTimeD() {
+  //               var d = new Date()
+  //               var m = d.getMinutes()
+  //               var h = d.getHours()
+  //               document.getElementById(
+  //                 "clock-d-" + 5555555555555555
+  //               ).textContent =
+  //                 ("0" + h).substr(-2) + ":" + ("0" + m).substr(-2)
+  //             }
+
+  onMount(() => {
+    const ct = new CanvasCircularCountdown(countdown, {
+      duration: 100 * 1000,
+      radius: 40,
+      progressBarWidth: 10,
+      progressBarOffset: 0,
+      circleBackgroundColor: "#fbd2d3",
+      emptyProgressBarBackgroundColor: "#b9c1c7",
+      filledProgressBarBackgroundColor: pickColorByPercentage,
+      captionColor: pickColorByPercentage,
+      captionFont: "22px serif",
+      showCaption: true,
+      captionText: pickTime,
+    })
+
+    ct.start()
+
+    // setInterval(clockTimeD, 1000)
+
+    // ct[5555555555555555] = new CanvasCircularCountdown(
+    //               document.getElementById(
+    //                 "countdown-canvas-" + 5555555555555555
+    //               ),
+    //               {
+    //                 duration: 100 * 1000,
+    //                 radius: 40,
+    //                 progressBarWidth: 10,
+    //                 progressBarOffset: 0,
+    //                 circleBackgroundColor: "#fbd2d3",
+    //                 emptyProgressBarBackgroundColor: "#b9c1c7",
+    //                 filledProgressBarBackgroundColor: pickColorByPercentage,
+    //                 captionColor: pickColorByPercentage,
+    //                 captionFont: "22px serif",
+    //                 showCaption: true,
+    //                 captionText: pickTime,
+    //               },
+    //               (percentage, time, instance) => {
+    //                 if (time.elapsed >= 5000) {
+    //                 }
+    //               }
+    //             )
+    //             var clockd = document.getElementById(
+    //               "clock-d-" + 5555555555555555
+    //             )
+    //             function clockTimeD() {
+    //               var d = new Date()
+    //               var m = d.getMinutes()
+    //               var h = d.getHours()
+    //               document.getElementById(
+    //                 "clock-d-" + 5555555555555555
+    //               ).textContent =
+    //                 ("0" + h).substr(-2) + ":" + ("0" + m).substr(-2)
+    //             }
+
+    //             setInterval(clockTimeD, 1000)
+  })
+
+  const pickTime = (percentage, time) => {
+    var seconds = (time.remaining / 1000).toFixed(0)
+    return seconds
+  }
+  const pickColorByPercentage = (percentage, time) => {
+    switch (true) {
+      case percentage >= 75:
+        return "#28a745" // green
+      case percentage >= 50 && percentage < 75:
+        return "#17a2b8" // blue
+      case percentage >= 25 && percentage < 50:
+        return "#ffc107" // orange
+      default:
+        return "#dc3545" // red
+    }
   }
 </script>
 
@@ -52,6 +140,7 @@
                 class="timecout-d"
                 name="d-5555555555555555"
                 id="countdown-canvas-5555555555555555"
+                bind:this={countdown}
               >
                 <canvas
                   width="160"
@@ -74,44 +163,6 @@
                 <span id="clock-d-5555555555555555">13:31</span>
                 <span>16/10/2023</span>
               </div>
-              <script>
-                ct[5555555555555555] = new CanvasCircularCountdown(
-                  document.getElementById(
-                    "countdown-canvas-" + 5555555555555555
-                  ),
-                  {
-                    duration: 100 * 1000,
-                    radius: 40,
-                    progressBarWidth: 10,
-                    progressBarOffset: 0,
-                    circleBackgroundColor: "#fbd2d3",
-                    emptyProgressBarBackgroundColor: "#b9c1c7",
-                    filledProgressBarBackgroundColor: pickColorByPercentage,
-                    captionColor: pickColorByPercentage,
-                    captionFont: "22px serif",
-                    showCaption: true,
-                    captionText: pickTime,
-                  },
-                  (percentage, time, instance) => {
-                    if (time.elapsed >= 5000) {
-                    }
-                  }
-                )
-                var clockd = document.getElementById(
-                  "clock-d-" + 5555555555555555
-                )
-                function clockTimeD() {
-                  var d = new Date()
-                  var m = d.getMinutes()
-                  var h = d.getHours()
-                  document.getElementById(
-                    "clock-d-" + 5555555555555555
-                  ).textContent =
-                    ("0" + h).substr(-2) + ":" + ("0" + m).substr(-2)
-                }
-
-                setInterval(clockTimeD, 1000)
-              </script>
             </div>
           </div>
         </div>
@@ -175,40 +226,6 @@
                 <span id="clock-m-5555555555555555">13:31</span>
                 <span>16/10/2023</span>
               </div>
-              <script>
-                ct2[5555555555555555] = new CanvasCircularCountdown(
-                  document.getElementById(
-                    "countdown-canvas-mb-" + 5555555555555555
-                  ),
-                  {
-                    duration: 100 * 1000,
-                    radius: 20,
-                    progressBarWidth: 5,
-                    progressBarOffset: 0,
-                    circleBackgroundColor: "#fbd2d3",
-                    emptyProgressBarBackgroundColor: "#b9c1c7",
-                    filledProgressBarBackgroundColor: pickColorByPercentage,
-                    captionColor: pickColorByPercentage,
-                    captionFont: "18px serif",
-                    showCaption: true,
-                    captionText: pickTime,
-                  },
-                  (percentage, time, instance) => {
-                    if (time.elapsed >= 5000) {
-                    }
-                  }
-                )
-                function clockTimeM() {
-                  var d = new Date()
-                  var m = d.getMinutes()
-                  var h = d.getHours()
-                  document.getElementById(
-                    "clock-m-" + 5555555555555555
-                  ).textContent =
-                    ("0" + h).substr(-2) + ":" + ("0" + m).substr(-2)
-                }
-                setInterval(clockTimeM, 1000)
-              </script>
             </div>
           </div>
         </div>
