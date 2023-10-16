@@ -3,6 +3,9 @@
   import upDiamond from "./assets/up_diamond.png"
   import Card from "./lib/Card.svelte"
   import bg from "./assets/bg.png"
+  import data from "../../scraper/data.json"
+
+  const { acc_points, card_number, expire_date, name, today_points } = data
 </script>
 
 <main class="stretched bg-white">
@@ -202,11 +205,11 @@
                           <div style="font-size: 15px;">
                             คะแนนปรับระดับสะสม <span
                               class="txt-red"
-                              style="font-size: 20px;">925</span
+                              style="font-size: 20px;">{acc_points}</span
                             >/1,200 คะแนน
                           </div>
                           <span style="font-size: 10px;">
-                            สะสมภายใน 30/11/2023</span
+                            สะสมภายใน {expire_date}</span
                           >
                         </div>
                         <div class="row d-flex justify-content-center">
@@ -216,7 +219,7 @@
                         </div>
 
                         <div class="mt-2">
-                          <h4>NAME SURNAME</h4>
+                          <h4>{name}</h4>
                         </div>
                         <ul class="list-inline mt-3">
                           <li class="list-inline-item p-divider">
@@ -238,26 +241,28 @@
                           <div class="text-start mx-1 my-2">
                             <div style="margin-left:8px;">
                               หมายเลขบัตรสมาชิก: <span class="txt-red">
-                                55555555555555
+                                {card_number}
                               </span>
                             </div>
                             <div style="margin-left:8px;">
                               บัตรสมาชิกหมดอายุ: <span class="txt-red">
-                                30/11/2023
+                                {expire_date}
                               </span>
                             </div>
                             <div style="margin-left:8px;">
-                              คะแนนสะสมวันนี้: <span class="txt-red"> 0 </span> คะแนน
+                              คะแนนสะสมวันนี้: <span class="txt-red">
+                                {today_points}
+                              </span> คะแนน
                             </div>
                             <div style="margin-left:8px;">
                               คะแนนแลกของรางวัล: <span class="txt-red">
-                                925
+                                {acc_points}
                               </span> คะแนน
                             </div>
                             <div style="margin-left:8px;color: #737373;">
                               วันหมดอายุ (คะแนนแลกของรางวัล):
                               <div class="ms-5">
-                                925 คะแนน หมดอายุ - 30/12/2023
+                                {acc_points} คะแนน หมดอายุ - 30/12/2023
                               </div>
                             </div>
                           </div>
