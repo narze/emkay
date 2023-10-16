@@ -44,7 +44,7 @@ def write_to_file(card_data)
 end
 
 Playwright.create(playwright_cli_executable_path: 'npx playwright') do |playwright|
-  playwright.chromium.launch(headless: false) do |browser|
+  playwright.chromium.launch(headless: ENV.has_key?("CI")) do |browser|
     context = browser.new_context # Prepare new window.
     page = context.new_page # Open new window and new tab here. (about:blank)
 

@@ -1,0 +1,46 @@
+name: Scrape
+
+on:
+  push:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 0 * * *"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.2"
+          bundler-cache: true
+          working-directory: ./scraper
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: lts
+
+      - name: Setup Playwright
+        run: npx playwright install
+
+      - name: Change working directory to scraper
+        run: cd scraper
+
+      - name: Scrape
+        env:
+          MK_USERNAME: ${{ secrets.MK_USERNAME }}
+          MK_PASSWORD: ${{ secrets.MK_PASSWORD }}
+        run: ruby main.rb
+
+      - name: Commit and push
+        run: |
+          git diff
+          git config --global user.email "notbarze@users.noreply.github.com"
+          git config --global user.name "narze's bot"
+          git add data.json
+          git commit -m "Refresh data.json" || exit 0
+          git push
