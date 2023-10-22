@@ -30,8 +30,8 @@ def get_card_data(page)
     name:,
     card_number:,
     expire_date: Date.parse(expire_date),
-    today_points: today_points.to_i,
-    acc_points: acc_points.to_i
+    today_points: today_points.gsub(',', '').to_i,
+    acc_points: acc_points.gsub(',', '').to_i
   }
 end
 
