@@ -6,6 +6,7 @@
   import data from "../../scraper/data.json"
   import format from "date-fns/format"
   import formatDistance from "date-fns/formatDistance"
+  import { onMount } from "svelte"
 
   const {
     acc_points,
@@ -21,6 +22,28 @@
 
   function showData() {
     alert(JSON.stringify(data, null, 2))
+  }
+
+  onMount(motd)
+
+  function motd() {
+    const key = "emkay-motd"
+
+    let currentDate = new Date().toDateString()
+
+    let lastAlertDate = localStorage.getItem(key)
+
+    if (lastAlertDate !== currentDate) {
+      const message = [
+        "วิธีใช้งาน",
+        "1. คลิกที่บัตรสมาชิก",
+        "2. โชว์ QR Code ให้พนักงานสแกน",
+        "3. รับส่วนลด",
+      ].join("\n")
+
+      alert(message)
+      localStorage.setItem(key, currentDate)
+    }
   }
 </script>
 
