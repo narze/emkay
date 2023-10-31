@@ -41,8 +41,11 @@
         "3. รับส่วนลด",
       ].join("\n")
 
-      alert(message)
       localStorage.setItem(key, currentDate)
+
+      setTimeout(() => {
+        alert(message)
+      }, 1000)
     }
   }
 </script>
