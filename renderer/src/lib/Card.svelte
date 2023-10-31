@@ -10,9 +10,11 @@
   import data from "../../../scraper/data.json"
 
   let countdown: HTMLElement, countdown2: HTMLElement
+  let ct: CanvasCircularCountdown, ct2: CanvasCircularCountdown
   let timestamp = new Date()
 
   const { acc_points, card_number, expire_date, name, today_points } = data
+  const DURATION = 100
 
   $: timestamp_formatted = format(timestamp, "yyyy-MM-dd HH:mm:ss")
   $: timestamp_display = format(timestamp, "HH:mm dd/MM/yyyy")
@@ -21,7 +23,16 @@
 
   function flip() {
     const card = document.querySelector(".flip-card")
+
     card.classList.toggle("flipped")
+
+    if (card.classList.contains("flipped")) {
+      ct.reset().start()
+      ct2.reset().start()
+    } else {
+      ct.stop()
+      ct2.stop()
+    }
   }
 
   function qrcode(node, options) {
@@ -33,37 +44,51 @@
   }
 
   onMount(() => {
-    const ct = new CanvasCircularCountdown(countdown, {
-      duration: 100 * 1000,
-      radius: 40,
-      progressBarWidth: 10,
-      progressBarOffset: 0,
-      circleBackgroundColor: "#fbd2d3",
-      emptyProgressBarBackgroundColor: "#b9c1c7",
-      filledProgressBarBackgroundColor: pickColorByPercentage,
-      captionColor: pickColorByPercentage,
-      captionFont: "22px serif",
-      showCaption: true,
-      captionText: pickTime,
-    })
+    ct = new CanvasCircularCountdown(
+      countdown,
+      {
+        duration: DURATION * 1000,
+        radius: 40,
+        progressBarWidth: 10,
+        progressBarOffset: 0,
+        circleBackgroundColor: "#fbd2d3",
+        emptyProgressBarBackgroundColor: "#b9c1c7",
+        filledProgressBarBackgroundColor: pickColorByPercentage,
+        captionColor: pickColorByPercentage,
+        captionFont: "22px serif",
+        showCaption: true,
+        captionText: pickTime,
+      },
+      (percentage, time, instance) => {
+        console.log({ percentage, time, instance })
 
-    ct.start()
+        if (time.remaining <= 100) {
+          instance.reset().start()
+        }
+      }
+    )
 
-    const ct2 = new CanvasCircularCountdown(countdown2, {
-      duration: 100 * 1000,
-      radius: 20,
-      progressBarWidth: 5,
-      progressBarOffset: 0,
-      circleBackgroundColor: "#fbd2d3",
-      emptyProgressBarBackgroundColor: "#b9c1c7",
-      filledProgressBarBackgroundColor: pickColorByPercentage,
-      captionColor: pickColorByPercentage,
-      captionFont: "18px serif",
-      showCaption: true,
-      captionText: pickTime,
-    })
-
-    ct2.start()
+    ct2 = new CanvasCircularCountdown(
+      countdown2,
+      {
+        duration: DURATION * 1000,
+        radius: 20,
+        progressBarWidth: 5,
+        progressBarOffset: 0,
+        circleBackgroundColor: "#fbd2d3",
+        emptyProgressBarBackgroundColor: "#b9c1c7",
+        filledProgressBarBackgroundColor: pickColorByPercentage,
+        captionColor: pickColorByPercentage,
+        captionFont: "18px serif",
+        showCaption: true,
+        captionText: pickTime,
+      },
+      (percentage, time, instance) => {
+        if (time.remaining <= 100) {
+          instance.reset().start()
+        }
+      }
+    )
   })
 
   const pickTime = (percentage, time) => {
