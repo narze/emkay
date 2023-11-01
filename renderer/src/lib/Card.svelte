@@ -5,6 +5,7 @@
   import format from "date-fns/format"
 
   import cardBlack from "../assets/card_black.jpg"
+  import cardDiamond from "../assets/card_diamond.jpg"
   import cardBackside from "../assets/card_backside.png"
   import duckJump from "../assets/duck_jump.gif"
   import data from "../../../scraper/data.json"
@@ -113,7 +114,7 @@
   <div class="flip-card-inner">
     <div class="flip-card-front">
       <div class="avatar mx-auto">
-        <img src={cardBlack} class="img-fluid" />
+        <img src={cardDiamond} class="img-fluid" />
       </div>
     </div>
     <div class="flip-card-back">
