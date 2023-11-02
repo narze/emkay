@@ -28,7 +28,7 @@
   onMount(() => {
     if (window.location.href.match(/emkay\.vercel/)) {
       hide = true
-      alert("ย้ายเว็บแล้ว โปรดถาม Facebook Messenger นะจ๊ะ")
+      alert("ย้ายเว็บแล้ว โปรดถามใน Facebook Messenger นะจ๊ะ")
       window.location.href = "https://m.me/narze?text=ขอเว็บ%20emkay%20ใหม่"
     } else {
       motd()
