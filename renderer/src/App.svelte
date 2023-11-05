@@ -10,6 +10,7 @@
 
   const {
     acc_points,
+    redeemable_points,
     card_number,
     expire_date,
     name,
@@ -310,13 +311,13 @@
                               </div>
                               <div style="margin-left:8px;">
                                 คะแนนแลกของรางวัล: <span class="txt-red">
-                                  {acc_points}
+                                  {redeemable_points}
                                 </span> คะแนน
                               </div>
                               <div style="margin-left:8px;color: #737373;">
                                 วันหมดอายุ (คะแนนแลกของรางวัล):
                                 <div class="ms-5">
-                                  {acc_points} คะแนน หมดอายุ - 30/12/2023
+                                  {redeemable_points} คะแนน หมดอายุ - 30/12/2023
                                 </div>
                               </div>
                             </div>
