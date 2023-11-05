@@ -218,7 +218,7 @@
 
                           <div class="row d-flex justify-content-center mt-1">
                             <div class="col-12" style="font-size:12px;">
-                              <label>UPGRADE</label>
+                              <label>MAINTAIN</label>
                             </div>
                             <div class="col-12">
                               <h6 class="fw-bold">MK DIAMOND CARD</h6>
