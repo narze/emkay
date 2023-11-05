@@ -24,14 +24,16 @@ end
 
 def get_card_data(page)
   name = page.query_selector('.card-body h4').inner_text
-  card_number, expire_date, today_points, acc_points = page.query_selector_all('.detail-profile .txt-red').map(&:inner_text).map(&:strip)
+  card_number, expire_date, today_points, redeemable_points = page.query_selector_all('.detail-profile .txt-red').map(&:inner_text).map(&:strip)
+  acc_points = page.get_by_text("คะแนนปรับระดับสะสม").locator(".txt-red").first.inner_text
 
   {
     name:,
     card_number:,
     expire_date: Date.parse(expire_date),
     today_points: today_points.gsub(',', '').to_i,
-    acc_points: acc_points.gsub(',', '').to_i
+    redeemable_points: redeemable_points.gsub(',', '').to_i,
+    acc_points: acc_points.gsub(',', '').to_i,
   }
 end
 
