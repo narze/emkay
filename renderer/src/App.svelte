@@ -260,7 +260,7 @@
                             <div style="font-size: 15px;">
                               คะแนนปรับระดับสะสม <span
                                 class="txt-red"
-                                style="font-size: 20px;">{acc_points}</span
+                                style="font-size: 20px;">{(acc_points ?? 0).toLocaleString()}</span
                               >/1,200 คะแนน
                             </div>
                             <span style="font-size: 10px;">
