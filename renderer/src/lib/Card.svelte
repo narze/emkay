@@ -10,7 +10,8 @@
   import duckJump from "../assets/duck_jump.gif"
   import data from "../../../scraper/data.json"
 
-  let countdown: HTMLElement = $state(), countdown2: HTMLElement = $state()
+  let countdown: HTMLElement = $state(),
+    countdown2: HTMLElement = $state()
   let ct: CanvasCircularCountdown, ct2: CanvasCircularCountdown
   let timestamp = new Date()
 
@@ -20,7 +21,9 @@
   let timestamp_formatted = $derived(format(timestamp, "yyyy-MM-dd HH:mm:ss"))
   let timestamp_display = $derived(format(timestamp, "HH:mm dd/MM/yyyy"))
 
-  let card_qrcode = $derived(`W|${card_number}|${expire_date}|${timestamp_formatted}`)
+  let card_qrcode = $derived(
+    `W|${card_number}|${expire_date}|${timestamp_formatted}`
+  )
 
   function flip() {
     const card = document.querySelector(".flip-card")
@@ -61,7 +64,7 @@
         captionText: pickTime,
       },
       (percentage, time, instance) => {
-        console.log({ percentage, time, instance })
+        // console.log({ percentage, time, instance })
 
         if (time.remaining <= 100) {
           instance.reset().start()
@@ -137,7 +140,7 @@
                   width="160"
                   height="160"
                   style="width: 80px; height: 80px;"
-></canvas>
+                ></canvas>
               </div>
             </div>
             <div class="row mt-2">
@@ -173,7 +176,7 @@
                   width="80"
                   height="80"
                   style="width: 40px; height: 40px;"
-></canvas>
+                ></canvas>
               </div>
             </div>
             <div class="row mt-2">

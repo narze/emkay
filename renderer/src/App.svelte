@@ -21,6 +21,10 @@
   const expire_date_display = format(new Date(expire_date), "dd/MM/yyyy")
   const progress = Math.min(Math.round((acc_points / 1200) * 100), 100)
   let hide = $state(false)
+  let showInstallPrompt = $state(false)
+  let deferredPrompt: any = null
+  let installButtonVisible = $state(false)
+  let installDebugInfo = $state("Waiting for beforeinstallprompt event...")
 
   function showData() {
     alert(JSON.stringify(data, null, 2))
@@ -33,6 +37,7 @@
       window.location.href = "https://m.me/narze?text=ขอเว็บ%20emkay%20ใหม่"
     } else {
       motd()
+      checkInstallable()
     }
   })
 
@@ -57,6 +62,88 @@
         alert(message)
       }, 1000)
     }
+  }
+
+  function checkInstallable() {
+    // Debug info for development
+    installButtonVisible = true
+
+    // Check if the app is already installed
+    if (window.matchMedia("(display-mode: standalone)").matches) {
+      installDebugInfo = "App is already installed (standalone mode)"
+      return // App is already installed
+    }
+
+    // Listen for the beforeinstallprompt event
+    window.addEventListener("beforeinstallprompt", (e: Event) => {
+      // Prevent the mini-infobar from appearing on mobile
+      e.preventDefault()
+      // Store the event so it can be triggered later
+      deferredPrompt = e
+      // Show the install button
+      showInstallPrompt = true
+      installDebugInfo = "beforeinstallprompt event fired! Ready to install."
+      console.log("beforeinstallprompt event fired", e)
+    })
+
+    // Listen for app installed event
+    window.addEventListener("appinstalled", () => {
+      // Log the installation
+      console.log("PWA was installed")
+      installDebugInfo = "PWA was successfully installed!"
+      // Hide the install button
+      showInstallPrompt = false
+      deferredPrompt = null
+    })
+  }
+
+  function installApp() {
+    if (!deferredPrompt) {
+      installDebugInfo =
+        "No install prompt available. Make sure criteria are met."
+      console.log("No beforeinstallprompt event stored")
+
+      // Try to manually check installability
+      if ("getInstalledRelatedApps" in navigator) {
+        installDebugInfo = "Checking installed related apps..."
+        // @ts-ignore
+        navigator.getInstalledRelatedApps().then((relatedApps) => {
+          if (relatedApps.length > 0) {
+            installDebugInfo =
+              "App is already installed according to getInstalledRelatedApps"
+          } else {
+            installDebugInfo =
+              "App is not installed, but no install prompt available"
+          }
+        })
+      }
+
+      return
+    }
+
+    // Show the install prompt
+    deferredPrompt.prompt()
+    installDebugInfo = "Install prompt shown to user"
+
+    // Wait for the user to respond to the prompt
+    deferredPrompt.userChoice.then((choiceResult: { outcome: string }) => {
+      if (choiceResult.outcome === "accepted") {
+        console.log("User accepted the install prompt")
+        installDebugInfo = "User accepted the install prompt"
+      } else {
+        console.log("User dismissed the install prompt")
+        installDebugInfo = "User dismissed the install prompt"
+      }
+      // Clear the saved prompt
+      deferredPrompt = null
+      showInstallPrompt = false
+    })
+  }
+
+  function closeInstallPrompt() {
+    showInstallPrompt = false
+    // Save to local storage that user declined to install
+    localStorage.setItem("pwa-install-declined", new Date().toISOString())
   }
 </script>
 
@@ -464,5 +551,104 @@
         </div>
       </div>
     </footer>
+
+    <!-- Add to Home Screen Banner -->
+    {#if showInstallPrompt}
+      <div class="install-banner">
+        <div class="install-banner-content">
+          <div class="install-text">
+            <strong>เพิ่ม eMKay ลงหน้าจอหลัก</strong>
+            <p>เข้าถึงบัตรสมาชิกได้ง่ายขึ้น ไม่ต้องเปิดเว็บไซต์</p>
+          </div>
+          <div class="install-actions">
+            <button class="btn btn-install" onclick={installApp}
+              >เพิ่มเลย</button
+            >
+            <button class="btn btn-close" onclick={closeInstallPrompt}
+              >ปิด</button
+            >
+          </div>
+        </div>
+      </div>
+    {/if}
+
+    <!-- Debug install button (only in development) -->
+    {#if installButtonVisible}
+      <div class="debug-banner">
+        <div>
+          <strong>PWA Debug:</strong>
+          {installDebugInfo}
+        </div>
+        <button class="btn btn-sm btn-secondary" onclick={installApp}
+          >Manual Install</button
+        >
+      </div>
+    {/if}
   </main>
 {/if}
+
+<style>
+  /* ... existing styles ... */
+
+  .install-banner {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: white;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    padding: 12px 16px;
+  }
+
+  .install-banner-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .install-text {
+    flex: 1;
+  }
+
+  .install-text p {
+    margin: 4px 0 0 0;
+    font-size: 0.9rem;
+    color: #666;
+  }
+
+  .install-actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  .btn-install {
+    background-color: #e51c23;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+  }
+
+  .btn-close {
+    background-color: transparent;
+    border: 1px solid #ddd;
+    padding: 8px 16px;
+    border-radius: 4px;
+  }
+
+  .debug-banner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #ddd;
+    padding: 8px 16px;
+    font-size: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 1001;
+  }
+</style>
