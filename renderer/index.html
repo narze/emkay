@@ -10,10 +10,49 @@
     <meta name="description" content="MK Restaurant Card App" />
     <meta name="theme-color" content="#ffffff" />
     <link rel="manifest" href="/manifest.json" />
+
+    <!-- iOS specific tags -->
     <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="eMKay" />
+
+    <!-- iOS splash screens -->
+    <link
+      rel="apple-touch-startup-image"
+      href="/icons/splash-640x1136.png"
+      media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      href="/icons/splash-750x1334.png"
+      media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      href="/icons/splash-1242x2208.png"
+      media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3)"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      href="/icons/splash-1125x2436.png"
+      media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      href="/icons/splash-1536x2048.png"
+      media="(min-device-width: 768px) and (max-device-width: 1024px) and (-webkit-device-pixel-ratio: 2)"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      href="/icons/splash-1668x2224.png"
+      media="(min-device-width: 834px) and (max-device-width: 834px) and (-webkit-device-pixel-ratio: 2)"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      href="/icons/splash-2048x2732.png"
+      media="(min-device-width: 1024px) and (max-device-width: 1024px) and (-webkit-device-pixel-ratio: 2)"
+    />
   </head>
   <body>
     <div id="app"></div>
@@ -22,13 +61,21 @@
     <!-- Service Worker Registration -->
     <script>
       if ("serviceWorker" in navigator) {
-        window.addEventListener("load", () => {
-          navigator.serviceWorker
-            .register("/sw.js")
-            .then((reg) => console.log("Service Worker registered: ", reg))
-            .catch((err) =>
-              console.log("Service Worker registration failed: ", err)
+        window.addEventListener("load", async () => {
+          try {
+            const registration = await navigator.serviceWorker.register(
+              "/sw.js",
+              {
+                scope: "/",
+              }
             )
+            console.log(
+              "Service Worker registered successfully with scope:",
+              registration.scope
+            )
+          } catch (error) {
+            console.error("Service Worker registration failed:", error)
+          }
         })
       }
     </script>

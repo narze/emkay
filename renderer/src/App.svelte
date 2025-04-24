@@ -23,8 +23,7 @@
   let hide = $state(false)
   let showInstallPrompt = $state(false)
   let deferredPrompt: any = null
-  let installButtonVisible = $state(false)
-  let installDebugInfo = $state("Waiting for beforeinstallprompt event...")
+  let isIOS = $state(false)
 
   function showData() {
     alert(JSON.stringify(data, null, 2))
@@ -37,7 +36,7 @@
       window.location.href = "https://m.me/narze?text=ขอเว็บ%20emkay%20ใหม่"
     } else {
       motd()
-      checkInstallable()
+      detectInstallableState()
     }
   })
 
@@ -64,86 +63,89 @@
     }
   }
 
-  function checkInstallable() {
-    // Debug info for development
-    installButtonVisible = true
-
-    // Check if the app is already installed
+  function detectInstallableState() {
+    // Check if already installed
     if (window.matchMedia("(display-mode: standalone)").matches) {
-      installDebugInfo = "App is already installed (standalone mode)"
-      return // App is already installed
+      return // Already installed, don't show prompts
     }
 
-    // Listen for the beforeinstallprompt event
-    window.addEventListener("beforeinstallprompt", (e: Event) => {
-      // Prevent the mini-infobar from appearing on mobile
-      e.preventDefault()
-      // Store the event so it can be triggered later
-      deferredPrompt = e
-      // Show the install button
-      showInstallPrompt = true
-      installDebugInfo = "beforeinstallprompt event fired! Ready to install."
-      console.log("beforeinstallprompt event fired", e)
-    })
+    // Check if this is iOS (which doesn't support beforeinstallprompt)
+    // @ts-ignore: MSStream is a non-standard property used to detect iOS
+    isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream
+
+    // Show install prompt based on last time shown
+    const lastShown = localStorage.getItem("a2hs-banner-shown")
+    const now = new Date().getTime()
+    const showBannerAgain =
+      !lastShown || now - parseInt(lastShown) > 1 * 60 * 60 * 1000 // 1 hour
+
+    if (showBannerAgain) {
+      if (isIOS) {
+        // For iOS, show banner immediately after a short delay
+        setTimeout(() => {
+          showInstallPrompt = true
+        }, 3000)
+      } else {
+        // For other browsers, listen for beforeinstallprompt
+        window.addEventListener("beforeinstallprompt", (e: Event) => {
+          // Prevent Chrome 67 and earlier from automatically showing the prompt
+          e.preventDefault()
+          // Store the event for later use
+          deferredPrompt = e
+          // Show banner
+          showInstallPrompt = true
+        })
+      }
+    }
 
     // Listen for app installed event
     window.addEventListener("appinstalled", () => {
-      // Log the installation
       console.log("PWA was installed")
-      installDebugInfo = "PWA was successfully installed!"
-      // Hide the install button
       showInstallPrompt = false
       deferredPrompt = null
     })
   }
 
   function installApp() {
-    if (!deferredPrompt) {
-      installDebugInfo =
-        "No install prompt available. Make sure criteria are met."
-      console.log("No beforeinstallprompt event stored")
+    if (isIOS) {
+      // Show iOS-specific instructions
+      const message =
+        "เพิ่ม eMKay ลงหน้าจอหลัก:\n\n" +
+        "1. แตะปุ่ม 'แชร์' (Share) ที่ด้านล่างของหน้าจอ\n" +
+        "2. เลื่อนลงและแตะ 'เพิ่มไปยังหน้าจอโฮม' (Add to Home Screen)\n" +
+        "3. แตะ 'เพิ่ม' (Add) ที่มุมบนขวา"
+      alert(message)
+    } else if (deferredPrompt) {
+      // Use standard PWA installation flow
+      deferredPrompt.prompt()
 
-      // Try to manually check installability
-      if ("getInstalledRelatedApps" in navigator) {
-        installDebugInfo = "Checking installed related apps..."
-        // @ts-ignore
-        navigator.getInstalledRelatedApps().then((relatedApps) => {
-          if (relatedApps.length > 0) {
-            installDebugInfo =
-              "App is already installed according to getInstalledRelatedApps"
-          } else {
-            installDebugInfo =
-              "App is not installed, but no install prompt available"
-          }
-        })
-      }
+      // Wait for user response
+      deferredPrompt.userChoice.then((choiceResult: { outcome: string }) => {
+        if (choiceResult.outcome === "accepted") {
+          console.log("User accepted the install prompt")
+        } else {
+          console.log("User dismissed the install prompt")
+        }
 
-      return
+        // Clear the saved prompt
+        deferredPrompt = null
+        showInstallPrompt = false
+      })
+    } else {
+      // Fallback instructions for browsers where beforeinstallprompt didn't fire
+      const message =
+        "เพิ่ม eMKay ลงหน้าจอหลัก:\n\n" +
+        "Chrome/Edge: เปิดเมนู (สามจุด) > ติดตั้ง eMKay...\n" +
+        "Samsung Internet: เมนู > เพิ่มไปยังหน้าจอหลัก\n" +
+        "Firefox: เมนู > ติดตั้งเป็นแอป... (ถ้ามี)"
+      alert(message)
     }
-
-    // Show the install prompt
-    deferredPrompt.prompt()
-    installDebugInfo = "Install prompt shown to user"
-
-    // Wait for the user to respond to the prompt
-    deferredPrompt.userChoice.then((choiceResult: { outcome: string }) => {
-      if (choiceResult.outcome === "accepted") {
-        console.log("User accepted the install prompt")
-        installDebugInfo = "User accepted the install prompt"
-      } else {
-        console.log("User dismissed the install prompt")
-        installDebugInfo = "User dismissed the install prompt"
-      }
-      // Clear the saved prompt
-      deferredPrompt = null
-      showInstallPrompt = false
-    })
   }
 
   function closeInstallPrompt() {
     showInstallPrompt = false
-    // Save to local storage that user declined to install
-    localStorage.setItem("pwa-install-declined", new Date().toISOString())
+    // Save to localStorage so we don't show again soon
+    localStorage.setItem("a2hs-banner-shown", new Date().getTime().toString())
   }
 </script>
 
@@ -561,27 +563,14 @@
             <p>เข้าถึงบัตรสมาชิกได้ง่ายขึ้น ไม่ต้องเปิดเว็บไซต์</p>
           </div>
           <div class="install-actions">
-            <button class="btn btn-install" onclick={installApp}
-              >เพิ่มเลย</button
-            >
+            <button class="btn btn-install" onclick={installApp}>
+              {isIOS ? "วิธีการเพิ่ม" : "เพิ่มเลย"}
+            </button>
             <button class="btn btn-close" onclick={closeInstallPrompt}
               >ปิด</button
             >
           </div>
         </div>
-      </div>
-    {/if}
-
-    <!-- Debug install button (only in development) -->
-    {#if installButtonVisible}
-      <div class="debug-banner">
-        <div>
-          <strong>PWA Debug:</strong>
-          {installDebugInfo}
-        </div>
-        <button class="btn btn-sm btn-secondary" onclick={installApp}
-          >Manual Install</button
-        >
       </div>
     {/if}
   </main>
@@ -635,20 +624,5 @@
     border: 1px solid #ddd;
     padding: 8px 16px;
     border-radius: 4px;
-  }
-
-  .debug-banner {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    background-color: #f8f9fa;
-    border-bottom: 1px solid #ddd;
-    padding: 8px 16px;
-    font-size: 12px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    z-index: 1001;
   }
 </style>
