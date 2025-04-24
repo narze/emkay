@@ -66,6 +66,8 @@
   function detectInstallableState() {
     // Check if already installed
     if (window.matchMedia("(display-mode: standalone)").matches) {
+      console.log("App is already installed (standalone mode)")
+      showInstallPrompt = false
       return // Already installed, don't show prompts
     }
 
@@ -73,29 +75,23 @@
     // @ts-ignore: MSStream is a non-standard property used to detect iOS
     isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream
 
-    // Show install prompt based on last time shown
-    const lastShown = localStorage.getItem("a2hs-banner-shown")
-    const now = new Date().getTime()
-    const showBannerAgain =
-      !lastShown || now - parseInt(lastShown) > 1 * 60 * 60 * 1000 // 1 hour
-
-    if (showBannerAgain) {
-      if (isIOS) {
-        // For iOS, show banner immediately after a short delay
-        setTimeout(() => {
-          showInstallPrompt = true
-        }, 3000)
-      } else {
-        // For other browsers, listen for beforeinstallprompt
-        window.addEventListener("beforeinstallprompt", (e: Event) => {
-          // Prevent Chrome 67 and earlier from automatically showing the prompt
-          e.preventDefault()
-          // Store the event for later use
-          deferredPrompt = e
-          // Show banner
-          showInstallPrompt = true
-        })
-      }
+    // Always show the banner if not installed
+    if (isIOS) {
+      // For iOS, show banner immediately after a short delay
+      setTimeout(() => {
+        showInstallPrompt = true
+      }, 1000)
+    } else {
+      // For other browsers, listen for beforeinstallprompt
+      window.addEventListener("beforeinstallprompt", (e: Event) => {
+        console.log("beforeinstallprompt", e)
+        // Prevent Chrome 67 and earlier from automatically showing the prompt
+        e.preventDefault()
+        // Store the event for later use
+        deferredPrompt = e
+        // Show banner
+        showInstallPrompt = true
+      })
     }
 
     // Listen for app installed event
@@ -144,8 +140,8 @@
 
   function closeInstallPrompt() {
     showInstallPrompt = false
-    // Save to localStorage so we don't show again soon
-    localStorage.setItem("a2hs-banner-shown", new Date().getTime().toString())
+    // We don't save a timestamp anymore since we always want to show the banner
+    // when the user returns, as long as the app is not installed
   }
 </script>
 
@@ -560,14 +556,13 @@
         <div class="install-banner-content">
           <div class="install-text">
             <strong>เพิ่ม eMKay ลงหน้าจอหลัก</strong>
-            <p>เข้าถึงบัตรสมาชิกได้ง่ายขึ้น ไม่ต้องเปิดเว็บไซต์</p>
+            <p>เข้าถึงบัตรสมาชิกได้ง่ายขึ้น เหมือนใช้แอป</p>
           </div>
           <div class="install-actions">
             <button class="btn btn-install" onclick={installApp}>
               {isIOS ? "วิธีการเพิ่ม" : "เพิ่มเลย"}
             </button>
-            <button class="btn btn-close" onclick={closeInstallPrompt}
-              >ปิด</button
+            <button class="btn btn-close" onclick={closeInstallPrompt}>⨯</button
             >
           </div>
         </div>
