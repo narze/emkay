@@ -4,8 +4,8 @@
   import Card from "./lib/Card.svelte"
   import bg from "./assets/bg.png"
   import data from "../../scraper/data.json"
-  import format from "date-fns/format"
-  import formatDistance from "date-fns/formatDistance"
+  import { format } from "date-fns/format"
+  import { formatDistance } from "date-fns/formatDistance"
   import { onMount } from "svelte"
 
   const {
@@ -65,10 +65,11 @@
     <header>
       <nav
         class="navbar navbar-light bg-white fixed-top navbar-expand-md bottom-shadow"
+        aria-label="Main navigation"
       >
         <div class="container-fluid">
-          <a class="navbar-brand" href="#" style="color: gray">
-            e<img src={logo} alt="Logo" width="80" height="60" />ay
+          <a class="navbar-brand" href="/" style="color: gray">
+            <img src={logo} alt="MK Restaurant Logo" width="80" height="60" />
           </a>
           <button
             class="navbar-toggler"
@@ -76,6 +77,8 @@
             data-bs-toggle="offcanvas"
             data-bs-target="#offcanvasNavbar"
             aria-controls="offcanvasNavbar"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
           >
             <span class="navbar-toggler-icon"></span>
           </button>
@@ -86,13 +89,13 @@
             aria-labelledby="offcanvasNavbarLabel"
           >
             <div class="offcanvas-header">
-              <h5 class="offcanvas-title" id="offcanvasNavbarLabel"></h5>
+              <h5 class="offcanvas-title" id="offcanvasNavbarLabel">เมนู</h5>
               <button
                 type="button"
                 class="btn-close text-reset"
                 data-bs-dismiss="offcanvas"
                 aria-label="Close"
-></button>
+              ></button>
             </div>
             <div class="offcanvas-body">
               <ul
@@ -122,29 +125,6 @@
                     href="https://www.mkrestaurant.com/th/card"
                     target="_blank">ประเภทบัตรสมาชิก MK</a
                   >
-                </li>
-
-                <li class="nav-item d-block d-sm-none d-sm-block d-md-none">
-                  <a class="nav-link" aria-current="page" href="#th/contact"
-                    >ติดต่อเรา</a
-                  >
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" aria-current="page" href="#th/logout"
-                    >ลงชื่อออก</a
-                  >
-                  <form
-                    id="logout-form"
-                    action="#th/logout"
-                    method="POST"
-                    class="d-none"
-                  >
-                    <input
-                      type="hidden"
-                      name="_token"
-                      value="s1FyH3i7F6g5zr8Hm7BLw63SRJUqZO28TCi7ZMTC"
-                    />
-                  </form>
                 </li>
 
                 <li
@@ -181,6 +161,8 @@
               class="carousel slide pointer-event"
               data-bs-ride="carousel"
               data-bs-interval="false"
+              aria-roledescription="carousel"
+              aria-label="Membership card information"
             >
               <div class="carousel-indicators">
                 <button
@@ -190,16 +172,20 @@
                   class="active"
                   aria-current="true"
                   aria-label="Slide 1"
-></button>
+                ></button>
                 <button
                   type="button"
                   data-bs-target="#carouselCard"
                   data-bs-slide-to="1"
                   aria-label="Slide 2"
-></button>
+                ></button>
               </div>
               <div class="carousel-inner">
-                <div class="carousel-item w-100 active">
+                <div
+                  class="carousel-item w-100 active"
+                  aria-roledescription="slide"
+                  aria-label="Membership card"
+                >
                   <div class="row text-center">
                     <div class="area1"></div>
                     <div class="card loginfm shadow-sm card-radius" id="card">
@@ -212,13 +198,13 @@
 
                           <div class="row d-flex justify-content-center mt-2">
                             <div class="col-md-3 col-10">
-                              <hr />
+                              <hr aria-hidden="true" />
                             </div>
                           </div>
 
                           <div class="row d-flex justify-content-center mt-1">
                             <div class="col-12" style="font-size:12px;">
-                              <label>MAINTAIN</label>
+                              <label for="what">MAINTAIN</label>
                             </div>
                             <div class="col-12">
                               <h6 class="fw-bold">MK DIAMOND CARD</h6>
@@ -234,21 +220,28 @@
                                 <div
                                   class="progress"
                                   style="height: 10px;background-color: #c2c2c2;"
+                                  role="progressbar"
+                                  aria-valuemin="0"
+                                  aria-valuemax="100"
+                                  aria-valuenow={progress}
+                                  aria-label="Point progress towards Diamond status"
                                 >
                                   <div
                                     class="progress-bar bg-danger"
-                                    role="progressbar"
                                     style={`width: ${progress}%;`}
-                                    aria-valuenow={progress}
-                                    aria-valuemin="0"
-                                    aria-valuemax="100"
                                   >
-                                    {progress}%
+                                    <span class="visually-hidden"
+                                      >{progress}% Complete</span
+                                    >
                                   </div>
                                 </div>
                               </div>
                               <div class="col-auto">
-                                <img src={upDiamond} width="80" />
+                                <img
+                                  src={upDiamond}
+                                  width="80"
+                                  alt="Diamond status icon"
+                                />
                               </div>
                             </div>
                           </div>
@@ -260,7 +253,8 @@
                             <div style="font-size: 15px;">
                               คะแนนปรับระดับสะสม <span
                                 class="txt-red"
-                                style="font-size: 20px;">{(acc_points ?? 0).toLocaleString()}</span
+                                style="font-size: 20px;"
+                                >{(acc_points ?? 0).toLocaleString()}</span
                               >/1,200 คะแนน
                             </div>
                             <span style="font-size: 10px;">
@@ -269,7 +263,7 @@
                           </div>
                           <div class="row d-flex justify-content-center">
                             <div class="col-md-3 col-10">
-                              <hr />
+                              <hr aria-hidden="true" />
                             </div>
                           </div>
 
@@ -330,6 +324,7 @@
                               class="btn btn-back"
                               href="#profile"
                               style="margin-right: 5px;"
+                              aria-label="Edit profile information"
                             >
                               แก้ไขข้อมูลส่วนตัว
                             </a>
@@ -337,6 +332,7 @@
                               class="btn btn-back history"
                               style="margin-right: 5px;"
                               onclick={showData}
+                              aria-label="View usage history"
                             >
                               ประวัติการใช้งาน
                             </button>
@@ -347,15 +343,20 @@
                   </div>
                 </div>
 
-                <div class="carousel-item w-100">
+                <div
+                  class="carousel-item w-100"
+                  aria-roledescription="slide"
+                  aria-label="Add new card"
+                >
                   <div class="row text-center">
                     <div class="area1"></div>
                     <div class="card loginfm shadow-sm card-radius" id="card">
                       <div class="avatar mx-auto">
-                        <a href="#products">
+                        <a href="#products" aria-label="Add new product">
                           <img
                             src="./mymk_files/addnew.png"
                             class="img-fluid"
+                            alt="Add new product"
                           />
                         </a>
                       </div>
@@ -370,8 +371,10 @@
                 type="button"
                 data-bs-target="#carouselCard"
                 data-bs-slide="prev"
+                aria-label="Previous slide"
               >
-                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="carousel-control-prev-icon" aria-hidden="true"
+                ></span>
                 <span class="visually-hidden">Previous</span>
               </button>
               <button
@@ -379,8 +382,10 @@
                 type="button"
                 data-bs-target="#carouselCard"
                 data-bs-slide="next"
+                aria-label="Next slide"
               >
-                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="carousel-control-next-icon" aria-hidden="true"
+                ></span>
                 <span class="visually-hidden">Next</span>
               </button>
             </div>
@@ -393,40 +398,49 @@
     <footer class="footer mt-auto pb-2">
       <div class="d-flex justify-content-center">
         <div class="col-9 col-md-6 col-lg-6 col-xl-6 col-xxl-5">
-          <hr style="height: 2px; margin:0px;" />
+          <hr style="height: 2px; margin:0px;" aria-hidden="true" />
         </div>
       </div>
       <div class="container">
         <div class="footer-font">
           <div class="d-flex justify-content-center mt-2">
-            <label>ติดต่อ MK Call Center 02-066-1000</label>
+            <label for="what">ติดต่อ MK Call Center 02-066-1000</label>
           </div>
           <div class="d-flex justify-content-center mt-1">
-            <label>จันทร์-ศุกร์: 08:00-21.00 น.</label>
+            <label for="what">จันทร์-ศุกร์: 08:00-21.00 น.</label>
           </div>
           <div class="d-flex justify-content-center mt-1">
-            <label>เสาร์-อาทิตย์ และวันหยุดนักขัตฤกษ์: 10:00-21.00 น.</label>
+            <label for="what"
+              >เสาร์-อาทิตย์ และวันหยุดนักขัตฤกษ์: 10:00-21.00 น.</label
+            >
           </div>
           <div class="row text-center">
             <div class="col-12 mt-1">
-              <a href="#term-conditions" target="_blank"
+              <a
+                href="#term-conditions"
+                target="_blank"
+                aria-label="ข้อกำหนดและเงื่อนไขสำหรับเว็บไซต์"
                 >ข้อกำหนดและเงื่อนไขสำหรับเว็บไซต์</a
               >
             </div>
             <div class="col-12 mt-1">
               <a
                 href="https://docs.t-reg.co/b1061f38-6502-475e-9f48-f860b508c63a/PrvNtc/%E0%B8%9B%E0%B8%A3%E0%B8%B0%E0%B8%81%E0%B8%B2%E0%B8%A8%E0%B8%84%E0%B8%A7%E0%B8%B2%E0%B8%A1%E0%B9%80%E0%B8%9B%E0%B9%87%E0%B8%99%E0%B8%AA%E0%B9%88%E0%B8%A7%E0%B8%99%E0%B8%95%E0%B8%B1%E0%B8%A7.pdf"
-                target="_blank">ประกาศความเป็นส่วนตัว</a
+                target="_blank"
+                aria-label="ประกาศความเป็นส่วนตัว">ประกาศความเป็นส่วนตัว</a
               >
             </div>
             <div class="col-12 mt-1">
               <a
                 href="https://docs.t-reg.co/b1061f38-6502-475e-9f48-f860b508c63a/PrvNtc/%E0%B8%99%E0%B9%82%E0%B8%A2%E0%B8%9A%E0%B8%B2%E0%B8%A2%E0%B8%81%E0%B8%B2%E0%B8%A3%E0%B9%83%E0%B8%8A%E0%B9%89%E0%B8%84%E0%B8%B8%E0%B8%81%E0%B8%81%E0%B8%B5%E0%B9%89.pdf"
-                target="_blank">นโยบายการใช้คุกกี้</a
+                target="_blank"
+                aria-label="นโยบายการใช้คุกกี้">นโยบายการใช้คุกกี้</a
               > &nbsp;&nbsp;
             </div>
             <div class="col-12 mt-1">
-              <a href="#DataAccessRequest"
+              <a
+                href="#DataAccessRequest"
+                aria-label="แบบฟอร์มการขอใช้สิทธิของเจ้าของข้อมูลส่วนบุคคล"
                 >แบบฟอร์มการขอใช้สิทธิของเจ้าของข้อมูลส่วนบุคคล</a
               >
             </div>
@@ -436,7 +450,8 @@
           <span
             ><a
               href="https://github.com/narze/emkay/blob/main/scraper/data.json"
-              class="text-muted">data.json</a
+              class="text-muted"
+              aria-label="View data.json on GitHub">data.json</a
             >
             updated at {format(new Date(updated_at), "HH:mm dd/MM/yyyy")} ({formatDistance(
               new Date(updated_at),
