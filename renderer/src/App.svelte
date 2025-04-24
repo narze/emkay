@@ -556,13 +556,16 @@
         <div class="install-banner-content">
           <div class="install-text">
             <strong>เพิ่ม eMKay ลงหน้าจอหลัก</strong>
-            <p>เข้าถึงบัตรสมาชิกได้ง่ายขึ้น เหมือนใช้แอป</p>
+            <p>เข้าถึงบัตรสมาชิกได้ง่ายขึ้น</p>
           </div>
           <div class="install-actions">
             <button class="btn btn-install" onclick={installApp}>
               {isIOS ? "วิธีการเพิ่ม" : "เพิ่มเลย"}
             </button>
-            <button class="btn btn-close" onclick={closeInstallPrompt}>⨯</button
+            <button
+              class="btn btn-close"
+              aria-label="Close"
+              onclick={closeInstallPrompt}>&nbsp;</button
             >
           </div>
         </div>
