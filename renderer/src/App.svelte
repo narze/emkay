@@ -21,6 +21,9 @@
   const expire_date_display = format(new Date(expire_date), "dd/MM/yyyy")
   const progress = Math.min(Math.round((acc_points / 1200) * 100), 100)
   let hide = $state(false)
+  let showInstallPrompt = $state(false)
+  let deferredPrompt: any = null
+  let isIOS = $state(false)
 
   function showData() {
     alert(JSON.stringify(data, null, 2))
@@ -33,6 +36,7 @@
       window.location.href = "https://m.me/narze?text=ขอเว็บ%20emkay%20ใหม่"
     } else {
       motd()
+      detectInstallableState()
     }
   })
 
@@ -57,6 +61,87 @@
         alert(message)
       }, 1000)
     }
+  }
+
+  function detectInstallableState() {
+    // Check if already installed
+    if (window.matchMedia("(display-mode: standalone)").matches) {
+      console.log("App is already installed (standalone mode)")
+      showInstallPrompt = false
+      return // Already installed, don't show prompts
+    }
+
+    // Check if this is iOS (which doesn't support beforeinstallprompt)
+    // @ts-ignore: MSStream is a non-standard property used to detect iOS
+    isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream
+
+    // Always show the banner if not installed
+    if (isIOS) {
+      // For iOS, show banner immediately after a short delay
+      setTimeout(() => {
+        showInstallPrompt = true
+      }, 1000)
+    } else {
+      // For other browsers, listen for beforeinstallprompt
+      window.addEventListener("beforeinstallprompt", (e: Event) => {
+        console.log("beforeinstallprompt", e)
+        // Prevent Chrome 67 and earlier from automatically showing the prompt
+        e.preventDefault()
+        // Store the event for later use
+        deferredPrompt = e
+        // Show banner
+        showInstallPrompt = true
+      })
+    }
+
+    // Listen for app installed event
+    window.addEventListener("appinstalled", () => {
+      console.log("PWA was installed")
+      showInstallPrompt = false
+      deferredPrompt = null
+    })
+  }
+
+  function installApp() {
+    if (isIOS) {
+      // Show iOS-specific instructions
+      const message =
+        "เพิ่ม eMKay ลงหน้าจอหลัก:\n\n" +
+        "1. แตะปุ่ม 'แชร์' (Share) ที่ด้านล่างของหน้าจอ\n" +
+        "2. เลื่อนลงและแตะ 'เพิ่มไปยังหน้าจอโฮม' (Add to Home Screen)\n" +
+        "3. แตะ 'เพิ่ม' (Add) ที่มุมบนขวา"
+      alert(message)
+    } else if (deferredPrompt) {
+      // Use standard PWA installation flow
+      deferredPrompt.prompt()
+
+      // Wait for user response
+      deferredPrompt.userChoice.then((choiceResult: { outcome: string }) => {
+        if (choiceResult.outcome === "accepted") {
+          console.log("User accepted the install prompt")
+        } else {
+          console.log("User dismissed the install prompt")
+        }
+
+        // Clear the saved prompt
+        deferredPrompt = null
+        showInstallPrompt = false
+      })
+    } else {
+      // Fallback instructions for browsers where beforeinstallprompt didn't fire
+      const message =
+        "เพิ่ม eMKay ลงหน้าจอหลัก:\n\n" +
+        "Chrome/Edge: เปิดเมนู (สามจุด) > ติดตั้ง eMKay...\n" +
+        "Samsung Internet: เมนู > เพิ่มไปยังหน้าจอหลัก\n" +
+        "Firefox: เมนู > ติดตั้งเป็นแอป... (ถ้ามี)"
+      alert(message)
+    }
+  }
+
+  function closeInstallPrompt() {
+    showInstallPrompt = false
+    // We don't save a timestamp anymore since we always want to show the banner
+    // when the user returns, as long as the app is not installed
   }
 </script>
 
@@ -464,5 +549,78 @@
         </div>
       </div>
     </footer>
+
+    <!-- Add to Home Screen Banner -->
+    {#if showInstallPrompt}
+      <div class="install-banner">
+        <div class="install-banner-content">
+          <div class="install-text">
+            <strong>เพิ่ม eMKay ลงหน้าจอหลัก</strong>
+            <p>เข้าถึงบัตรสมาชิกได้ง่ายขึ้น</p>
+          </div>
+          <div class="install-actions">
+            <button class="btn btn-install" onclick={installApp}>
+              {isIOS ? "วิธีการเพิ่ม" : "เพิ่มเลย"}
+            </button>
+            <button
+              class="btn btn-close"
+              aria-label="Close"
+              onclick={closeInstallPrompt}>&nbsp;</button
+            >
+          </div>
+        </div>
+      </div>
+    {/if}
   </main>
 {/if}
+
+<style>
+  /* ... existing styles ... */
+
+  .install-banner {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: white;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    padding: 12px 16px;
+  }
+
+  .install-banner-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .install-text {
+    flex: 1;
+  }
+
+  .install-text p {
+    margin: 4px 0 0 0;
+    font-size: 0.9rem;
+    color: #666;
+  }
+
+  .install-actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  .btn-install {
+    background-color: #e51c23;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+  }
+
+  .btn-close {
+    background-color: transparent;
+    border: 1px solid #ddd;
+    padding: 8px 16px;
+    border-radius: 4px;
+  }
+</style>
