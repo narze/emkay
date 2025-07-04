@@ -48,5 +48,6 @@ jobs:
           git config --global user.email "notbarze@users.noreply.github.com"
           git config --global user.name "narze's bot"
           git add data.json
-          git commit -m "Refresh data.json" || exit 0
+          git add history.ndjson
+          git commit -m "Update data" || exit 0
           git push

@@ -43,6 +43,10 @@ def write_to_file(card_data)
   puts "Write to data.json: #{data}"
 
   File.write('data.json', JSON.pretty_generate(data))
+
+  File.open('history.ndjson', 'a') do |f|
+    f.puts JSON.generate(data)
+  end
 end
 
 Playwright.create(playwright_cli_executable_path: 'npx playwright@1.52.0') do |playwright|
