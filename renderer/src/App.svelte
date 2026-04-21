@@ -24,10 +24,48 @@
   let showInstallPrompt = $state(false)
   let deferredPrompt: any = null
   let isIOS = $state(false)
+  let isNavOpen = $state(false)
 
   function showData() {
     alert(JSON.stringify(data, null, 2))
   }
+
+  function openNav() {
+    isNavOpen = true
+  }
+
+  function closeNav() {
+    isNavOpen = false
+  }
+
+  function toggleNav() {
+    isNavOpen = !isNavOpen
+  }
+
+  function refreshTo(hashHref: string) {
+    closeNav()
+    const hash = hashHref.startsWith("#") ? hashHref.slice(1) : hashHref
+    window.location.hash = hash
+    setTimeout(() => window.location.reload(), 0)
+  }
+
+  $effect(() => {
+    if (!isNavOpen) return
+
+    const prevOverflow = document.body.style.overflow
+    document.body.style.overflow = "hidden"
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") closeNav()
+    }
+
+    window.addEventListener("keydown", onKeyDown)
+
+    return () => {
+      window.removeEventListener("keydown", onKeyDown)
+      document.body.style.overflow = prevOverflow
+    }
+  })
 
   onMount(() => {
     if (false && window.location.href.match(/emkay\.vercel/)) {
@@ -159,27 +197,36 @@
           <button
             class="navbar-toggler"
             type="button"
-            data-bs-toggle="offcanvas"
-            data-bs-target="#offcanvasNavbar"
             aria-controls="offcanvasNavbar"
-            aria-expanded="false"
+            aria-expanded={isNavOpen}
             aria-label="Toggle navigation"
+            onclick={toggleNav}
           >
             <span class="navbar-toggler-icon"></span>
           </button>
+          {#if isNavOpen}
+            <div
+              class="offcanvas-backdrop show"
+              aria-hidden="true"
+              onclick={closeNav}
+            ></div>
+          {/if}
           <div
             class="offcanvas offcanvas-end"
+            class:show={isNavOpen}
             tabindex="-1"
             id="offcanvasNavbar"
             aria-labelledby="offcanvasNavbarLabel"
+            role="dialog"
+            aria-modal={isNavOpen}
           >
             <div class="offcanvas-header">
               <h5 class="offcanvas-title" id="offcanvasNavbarLabel">เมนู</h5>
               <button
                 type="button"
                 class="btn-close text-reset"
-                data-bs-dismiss="offcanvas"
                 aria-label="Close"
+                onclick={closeNav}
               ></button>
             </div>
             <div class="offcanvas-body">
@@ -187,20 +234,47 @@
                 class="navbar-nav justify-content-end flex-grow-1 pe-3 text-center"
               >
                 <li class="nav-item">
-                  <a class="nav-link active" aria-current="page" href="#th/home"
+                  <a
+                    class="nav-link active"
+                    aria-current="page"
+                    href="#th/home"
+                    onclick={(e) => {
+                      e.preventDefault()
+                      refreshTo("#th/home")
+                    }}
                     >หน้าแรก</a
                   >
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" href="#th/profile">ข้อมูลส่วนตัว</a>
+                  <a
+                    class="nav-link"
+                    href="#th/profile"
+                    onclick={(e) => {
+                      e.preventDefault()
+                      refreshTo("#th/profile")
+                    }}
+                    >ข้อมูลส่วนตัว</a
+                  >
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" href="#th/order-history"
+                  <a
+                    class="nav-link"
+                    href="#th/order-history"
+                    onclick={(e) => {
+                      e.preventDefault()
+                      refreshTo("#th/order-history")
+                    }}
                     >ประวัติการซื้อบัตรสมาชิก</a
                   >
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" href="#th/change-password"
+                  <a
+                    class="nav-link"
+                    href="#th/change-password"
+                    onclick={(e) => {
+                      e.preventDefault()
+                      refreshTo("#th/change-password")
+                    }}
                     >เปลี่ยนรหัสผ่าน</a
                   >
                 </li>
@@ -222,9 +296,13 @@
 
                 <li class="nav-item d-block d-sm-none d-sm-block d-md-none">
                   <span class="nav-link">
-                    <a aria-current="page" href="#th/home">TH</a>
+                    <a aria-current="page" href="#th/home" onclick={closeNav}
+                      >TH</a
+                    >
                     |
-                    <a aria-current="page" href="#en/home">EN</a>
+                    <a aria-current="page" href="#en/home" onclick={closeNav}
+                      >EN</a
+                    >
                   </span>
                 </li>
               </ul>
