@@ -42,6 +42,13 @@
     isNavOpen = !isNavOpen
   }
 
+  function refreshTo(hashHref: string) {
+    closeNav()
+    const hash = hashHref.startsWith("#") ? hashHref.slice(1) : hashHref
+    window.location.hash = hash
+    setTimeout(() => window.location.reload(), 0)
+  }
+
   $effect(() => {
     if (!isNavOpen) return
 
@@ -231,12 +238,21 @@
                     class="nav-link active"
                     aria-current="page"
                     href="#th/home"
-                    onclick={closeNav}
+                    onclick={(e) => {
+                      e.preventDefault()
+                      refreshTo("#th/home")
+                    }}
                     >หน้าแรก</a
                   >
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" href="#th/profile" onclick={closeNav}
+                  <a
+                    class="nav-link"
+                    href="#th/profile"
+                    onclick={(e) => {
+                      e.preventDefault()
+                      refreshTo("#th/profile")
+                    }}
                     >ข้อมูลส่วนตัว</a
                   >
                 </li>
@@ -244,7 +260,10 @@
                   <a
                     class="nav-link"
                     href="#th/order-history"
-                    onclick={closeNav}
+                    onclick={(e) => {
+                      e.preventDefault()
+                      refreshTo("#th/order-history")
+                    }}
                     >ประวัติการซื้อบัตรสมาชิก</a
                   >
                 </li>
@@ -252,7 +271,10 @@
                   <a
                     class="nav-link"
                     href="#th/change-password"
-                    onclick={closeNav}
+                    onclick={(e) => {
+                      e.preventDefault()
+                      refreshTo("#th/change-password")
+                    }}
                     >เปลี่ยนรหัสผ่าน</a
                   >
                 </li>
