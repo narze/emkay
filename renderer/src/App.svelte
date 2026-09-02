@@ -156,6 +156,9 @@
   const progress = Math.min((member.acc_points / tierTarget) * 100, 100)
   // tier_id of the member's card in the MKONE API (1 = RED, 2 = BLACK, 3 = GOLD).
   const memberTierId = 3
+  // The card on show is always the member's own. The selector below it only
+  // switches which tier's privileges are listed.
+  const memberTier = tiers[memberTierId - 1]
 
   const loadedAt = new Date()
   const qrValue = buildQrValue({
@@ -165,7 +168,7 @@
     at: loadedAt,
   })
 
-  let activeTier = 2
+  let activeTier = memberTierId - 1
   let now = loadedAt
   let cardActive = false
   let scrolled = false
@@ -299,8 +302,8 @@
             >
               <img
                 class="card-art"
-                src={selectedTier.card}
-                alt={`${selectedTier.name} MKONE membership card`}
+                src={memberTier.card}
+                alt={`${memberTier.name} MKONE membership card`}
               />
 
               <div class="qr-column">

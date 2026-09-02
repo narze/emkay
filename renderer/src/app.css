@@ -53,6 +53,13 @@ body,
   margin: 0;
 }
 
+/* The zoomed card reaches past the phone frame, so keep sideways scroll off
+   the page without clipping it at the frame edge. */
+html {
+  overflow-x: hidden;
+  overflow-x: clip;
+}
+
 body {
   min-height: 100vh;
   min-height: 100dvh;
@@ -92,7 +99,6 @@ h2 {
   max-width: 640px;
   min-height: 100vh;
   min-height: 100dvh;
-  overflow-x: hidden;
   background-image: var(--app-background);
   background-position: top center;
   background-repeat: no-repeat;
