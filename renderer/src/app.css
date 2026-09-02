@@ -121,19 +121,28 @@ h2 {
   display: flex;
   width: 100%;
   max-width: 640px;
-  height: calc(48px + env(safe-area-inset-top));
+  height: calc(76px + env(safe-area-inset-top));
   padding-top: env(safe-area-inset-top);
   align-items: center;
   justify-content: center;
-  border-top: 1px solid #f3f4f6;
+  pointer-events: auto;
+  transition:
+    height 500ms ease,
+    background-color 500ms ease,
+    box-shadow 500ms ease;
+}
+
+/* Past a short scroll the bar collapses onto a solid white strip. */
+.header-inner.scrolled {
+  height: calc(48px + env(safe-area-inset-top));
+  border-top: 0.5px solid #f3f4f6;
   background: #fff;
   box-shadow: 0 1px 2px rgb(0 0 0 / 5%);
-  pointer-events: auto;
 }
 
 .header-inner img {
   width: auto;
-  height: 26px;
+  height: 44px;
 }
 
 .content {
@@ -211,8 +220,9 @@ h2 {
 
 .updated-at {
   margin-top: 4px;
-  color: #666;
+  color: #a2a2a2;
   font-size: 12px;
+  font-weight: 400;
   line-height: 18px;
 }
 
@@ -236,12 +246,17 @@ h2 {
   position: relative;
   width: 100%;
   aspect-ratio: 1.37 / 1;
-  perspective: 1000px;
+  border-radius: 16px;
+  cursor: pointer;
+  perspective: 1500px;
+  touch-action: none;
+  user-select: none;
 }
 
 .membership-card {
-  --rotate-x: 0deg;
-  --rotate-y: 0deg;
+  --rotate-x: 0;
+  --rotate-y: 0;
+  --rotate-z: 0deg;
   --glow-x: 50%;
   --glow-y: 50%;
 
@@ -250,10 +265,21 @@ h2 {
   height: 100%;
   border-radius: 16px;
   outline: none;
-  transform: perspective(1000px) rotateX(var(--rotate-x))
-    rotateY(var(--rotate-y));
+  transform: scaleX(1) rotate3d(0, 0, 0, 0);
   transform-style: preserve-3d;
-  transition: transform 200ms ease-out;
+  transition:
+    transform 300ms ease-out,
+    box-shadow 300ms ease-out;
+  will-change: transform;
+}
+
+.membership-card.active {
+  box-shadow:
+    0 20px 40px rgb(0 0 0 / 20%),
+    0 15px 30px rgb(0 0 0 / 15%);
+  transform: scale3d(1.13, 1.13, 1.13)
+    rotate3d(var(--rotate-x), var(--rotate-y), 0, var(--rotate-z));
+  transition: transform 50ms ease-out;
 }
 
 .card-art {
@@ -299,7 +325,9 @@ h2 {
 
 .qr-box {
   display: flex;
-  width: 100%;
+
+  /* The QR itself spans the column width, so the 4px frame sits outside it. */
+  width: calc(100% + 8px);
   padding: 4px;
   margin-bottom: 4px;
   align-items: center;
@@ -323,11 +351,8 @@ h2 {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 40%;
-  max-width: 72px;
-  padding: 2px 3px;
-  border-radius: 2px;
-  background: #fff;
+  width: 33%;
+  aspect-ratio: 3.2 / 1;
   transform: translate(-50%, -50%);
 }
 
@@ -349,7 +374,7 @@ h2 {
 }
 
 .membership-number {
-  padding: 4px 8px;
+  padding: 4px 12px;
   margin-bottom: 4px;
 }
 
@@ -367,14 +392,14 @@ h2 {
 
 .card-date,
 .card-time {
-  padding: 4px 8px;
+  padding: 4px 16px;
   margin-bottom: 4px;
 }
 
 .card-time {
   margin-bottom: 0;
   font-size: 11px;
-  line-height: 16px;
+  line-height: 16.5px;
 }
 
 .screenshot-note {
@@ -546,26 +571,17 @@ h2 {
   display: flex;
   width: 68px;
   height: 58px;
-  padding: 8px 2px;
+  padding: 8px;
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
-  color: #6f6f6f;
+  color: #a2a2a2;
 }
 
 .nav-item svg {
   width: 18px;
   height: 18px;
-  fill: none;
-  stroke: currentcolor;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  stroke-width: 1.7;
-}
-
-.nav-item svg.solid {
   fill: currentcolor;
-  stroke: none;
 }
 
 .nav-item span {
@@ -580,7 +596,8 @@ h2 {
 }
 
 .nav-item.active span {
-  font-weight: 600;
+  color: #ed1c24;
+  font-weight: 700;
 }
 
 .sr-only {
