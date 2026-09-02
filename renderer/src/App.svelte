@@ -156,34 +156,28 @@
   // tier_id of the member's card in the MKONE API (1 = RED, 2 = BLACK, 3 = GOLD).
   const memberTierId = 3
 
+  const loadedAt = new Date()
+  const qrValue = buildQrValue({
+    cardNumber: member.card_number,
+    tierId: memberTierId,
+    expireDate: member.expire_date,
+    at: loadedAt,
+  })
+
   let activeTier = 2
-  let now = new Date()
+  let now = loadedAt
   let cardActive = false
 
   $: selectedTier = tiers[activeTier]
   $: today = format(now, "d MMM yyyy")
   $: clock = format(now, "hh:mm:ss a")
-  $: qrValue = buildQrValue({
-    cardNumber: member.card_number,
-    tierId: memberTierId,
-    expireDate: member.expire_date,
-    at: now,
-  })
 
-  function drawQr(node: HTMLCanvasElement, value: string) {
-    const render = (next: string) => {
-      void QRCode.toCanvas(node, next, {
-        errorCorrectionLevel: "H",
-        margin: 0,
-        width: 256,
-      })
-    }
-
-    render(value)
-
-    return {
-      update: render,
-    }
+  function drawQr(node: HTMLCanvasElement) {
+    void QRCode.toCanvas(node, qrValue, {
+      errorCorrectionLevel: "H",
+      margin: 0,
+      width: 256,
+    })
   }
 
   function tiltCard(event: PointerEvent) {
@@ -287,7 +281,7 @@
                     aria-label="Membership QR code"
                   >
                     <canvas
-                      use:drawQr={qrValue}
+                      use:drawQr
                       aria-hidden="true"
                     ></canvas>
                     <div class="qr-logo" aria-hidden="true">
