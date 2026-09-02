@@ -4,6 +4,7 @@
   import QRCode from "qrcode"
 
   import member from "../../scraper/data.json"
+  import { buildQrValue } from "./lib/qr"
   import background from "./assets/mkone/img/background.jpg"
   import brandHakata from "./assets/mkone/img/brand-hakata.png"
   import brandLaemCharoen from "./assets/mkone/img/brand-laemcharoen.png"
@@ -152,23 +153,37 @@
   const formattedPoints = member.acc_points.toLocaleString("en-US")
   const formattedTarget = tierTarget.toLocaleString("en-US")
   const progress = Math.min((member.acc_points / tierTarget) * 100, 100)
-  const loadedAt = new Date()
-  const qrValue = `W|${member.card_number}|${member.expire_date}|${format(loadedAt, "yyyy-MM-dd HH:mm:ss")}`
+  // tier_id of the member's card in the MKONE API (1 = RED, 2 = BLACK, 3 = GOLD).
+  const memberTierId = 3
 
   let activeTier = 2
-  let now = loadedAt
+  let now = new Date()
   let cardActive = false
 
   $: selectedTier = tiers[activeTier]
   $: today = format(now, "d MMM yyyy")
   $: clock = format(now, "hh:mm:ss a")
+  $: qrValue = buildQrValue({
+    cardNumber: member.card_number,
+    tierId: memberTierId,
+    expireDate: member.expire_date,
+    at: now,
+  })
 
-  function drawQr(node: HTMLCanvasElement) {
-    void QRCode.toCanvas(node, qrValue, {
-      errorCorrectionLevel: "H",
-      margin: 0,
-      width: 256,
-    })
+  function drawQr(node: HTMLCanvasElement, value: string) {
+    const render = (next: string) => {
+      void QRCode.toCanvas(node, next, {
+        errorCorrectionLevel: "H",
+        margin: 0,
+        width: 256,
+      })
+    }
+
+    render(value)
+
+    return {
+      update: render,
+    }
   }
 
   function tiltCard(event: PointerEvent) {
@@ -272,7 +287,7 @@
                     aria-label="Membership QR code"
                   >
                     <canvas
-                      use:drawQr
+                      use:drawQr={qrValue}
                       aria-hidden="true"
                     ></canvas>
                     <div class="qr-logo" aria-hidden="true">
