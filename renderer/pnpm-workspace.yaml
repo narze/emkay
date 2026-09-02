@@ -1,2 +1,7 @@
+# pnpm 9, which Vercel uses for this project, rejects a workspace file with no
+# packages field. This app is the only package, so declare just the root.
+packages:
+  - "."
+
 allowBuilds:
   esbuild: true
