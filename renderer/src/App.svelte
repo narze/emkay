@@ -172,8 +172,12 @@
   let now = loadedAt
   let cardActive = false
   let scrolled = false
+  let panelHeights: number[] = []
 
   $: selectedTier = tiers[activeTier]
+  // The viewport takes the height of the tier on show, so the page below it
+  // does not jump as the track slides between tiers of different lengths.
+  $: panelHeight = panelHeights[activeTier] ?? 0
   $: today = format(now, "d MMM yyyy")
   $: clock = format(now, "hh:mm:ss a")
 
@@ -361,38 +365,53 @@
           {/each}
         </div>
 
-        {#key activeTier}
-          <div class="privilege-panel" aria-live="polite">
-            <div class="tier-description">
-              <img src={selectedTier.card} alt="" />
-              <div>
-                <strong>Description</strong>
-                <p>{selectedTier.description}</p>
+        <div
+          class="privilege-viewport"
+          style:height={panelHeight ? `${panelHeight}px` : null}
+        >
+          <div
+            class="privilege-track"
+            style:transform={`translateX(-${activeTier * 100}%)`}
+          >
+            {#each tiers as tier, tierIndex}
+              <div
+                class="privilege-panel"
+                bind:clientHeight={panelHeights[tierIndex]}
+                aria-hidden={tierIndex !== activeTier}
+                inert={tierIndex !== activeTier ? true : undefined}
+              >
+                <div class="tier-description">
+                  <img src={tier.card} alt="" />
+                  <div>
+                    <strong>Description</strong>
+                    <p>{tier.description}</p>
+                  </div>
+                </div>
+
+                <h1>{tier.name} Privilege</h1>
+
+                <div class="brand-list">
+                  {#each brands as brand, brandIndex}
+                    <section
+                      class="brand-privileges"
+                      aria-labelledby={`brand-${tierIndex}-${brandIndex}`}
+                    >
+                      <h2 id={`brand-${tierIndex}-${brandIndex}`}>
+                        <img src={brand.image} alt="" />
+                        <span class="sr-only">{brand.name}</span>
+                      </h2>
+                      <ul>
+                        {#each tier.privileges[brandIndex] as privilege}
+                          <li>{privilege}</li>
+                        {/each}
+                      </ul>
+                    </section>
+                  {/each}
+                </div>
               </div>
-            </div>
-
-            <h1>{selectedTier.name} Privilege</h1>
-
-            <div class="brand-list">
-              {#each brands as brand, brandIndex}
-                <section
-                  class="brand-privileges"
-                  aria-labelledby={`brand-${brandIndex}`}
-                >
-                  <h2 id={`brand-${brandIndex}`}>
-                    <img src={brand.image} alt="" />
-                    <span class="sr-only">{brand.name}</span>
-                  </h2>
-                  <ul>
-                    {#each selectedTier.privileges[brandIndex] as privilege}
-                      <li>{privilege}</li>
-                    {/each}
-                  </ul>
-                </section>
-              {/each}
-            </div>
+            {/each}
           </div>
-        {/key}
+        </div>
       </section>
     </div>
   </main>
