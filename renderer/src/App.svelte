@@ -245,7 +245,7 @@
 </script>
 
 <svelte:head>
-  <title>MKONE | My Card</title>
+  <title>MKONE</title>
   <meta
     name="description"
     content="View your MKONE membership card, tier points, and privileges."
