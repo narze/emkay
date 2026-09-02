@@ -2,7 +2,7 @@
   import CanvasCircularCountdown from "canvas-circular-countdown"
   import { onMount } from "svelte"
   import QRCode from "qrcode"
-  import format from "date-fns/format"
+  import { format } from "date-fns"
 
   import cardBlack from "../assets/card_black.jpg"
   import cardDiamond from "../assets/card_diamond.jpg"
@@ -10,9 +10,9 @@
   import duckJump from "../assets/duck_jump.gif"
   import data from "../../../scraper/data.json"
 
-  let countdown: HTMLElement = $state(),
-    countdown2: HTMLElement = $state()
-  let ct: CanvasCircularCountdown, ct2: CanvasCircularCountdown
+  let countdown = $state<HTMLElement>()
+  let countdown2 = $state<HTMLElement>()
+  let ct: any, ct2: any
   let timestamp = new Date()
 
   const { acc_points, card_number, expire_date, name, today_points } = data
@@ -27,6 +27,7 @@
 
   function flip() {
     const card = document.querySelector(".flip-card")
+    if (!card) return
 
     card.classList.toggle("flipped")
 
@@ -39,7 +40,10 @@
     }
   }
 
-  function qrcode(node, options) {
+  function qrcode(
+    node: HTMLCanvasElement,
+    options: { value: string; size: number }
+  ) {
     const { value, size } = options
     QRCode.toCanvas(node, value, {
       margin: 0,
@@ -63,7 +67,7 @@
         showCaption: true,
         captionText: pickTime,
       },
-      (percentage, time, instance) => {
+      (percentage: number, time: { remaining: number }, instance: any) => {
         // console.log({ percentage, time, instance })
 
         if (time.remaining <= 100) {
@@ -87,7 +91,7 @@
         showCaption: true,
         captionText: pickTime,
       },
-      (percentage, time, instance) => {
+      (percentage: number, time: { remaining: number }, instance: any) => {
         if (time.remaining <= 100) {
           instance.reset().start()
         }
@@ -95,11 +99,14 @@
     )
   })
 
-  const pickTime = (percentage, time) => {
+  const pickTime = (
+    _percentage: number,
+    time: { remaining: number }
+  ) => {
     var seconds = (time.remaining / 1000).toFixed(0)
     return seconds
   }
-  const pickColorByPercentage = (percentage, time) => {
+  const pickColorByPercentage = (percentage: number) => {
     switch (true) {
       case percentage >= 75:
         return "#28a745" // green
@@ -113,16 +120,24 @@
   }
 </script>
 
-<div class="flip-card" onclick={flip}>
+<div
+  class="flip-card"
+  role="button"
+  tabindex="0"
+  onclick={flip}
+  onkeydown={(event) => {
+    if (event.key === "Enter" || event.key === " ") flip()
+  }}
+>
   <div class="flip-card-inner">
     <div class="flip-card-front">
       <div class="avatar mx-auto">
-        <img src={cardDiamond} class="img-fluid" />
+        <img src={cardDiamond} class="img-fluid" alt="Membership card front" />
       </div>
     </div>
     <div class="flip-card-back">
       <div class="avatar mx-auto back-card">
-        <img src={cardBackside} class="img-fluid" />
+        <img src={cardBackside} class="img-fluid" alt="Membership card back" />
 
         <div class="d-none d-md-block">
           <div class="row" style="position: relative;bottom: 270px;">
@@ -132,7 +147,7 @@
             <div class="col-6">
               <div class="row">
                 <div class="col-4 mt-5">
-                  <img src={duckJump} width="120" />
+                  <img src={duckJump} width="120" alt="" />
                 </div>
               </div>
               <div class="timecout-d" bind:this={countdown}>
@@ -168,7 +183,7 @@
             <div class="col-6">
               <div class="row">
                 <div class="col-5 mt-2">
-                  <img src={duckJump} width="80" />
+                  <img src={duckJump} width="80" alt="" />
                 </div>
               </div>
               <div class="timecout-m" bind:this={countdown2}>

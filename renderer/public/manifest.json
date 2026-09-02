@@ -1,7 +1,7 @@
 {
-  "name": "eMKay",
-  "short_name": "eMKay",
-  "description": "MK Restaurant Card App",
+  "name": "MKONE",
+  "short_name": "MKONE",
+  "description": "MKONE membership card, tier points, and privileges",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
