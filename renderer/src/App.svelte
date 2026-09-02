@@ -15,7 +15,6 @@
   import cardGold from "./assets/mkone/img/card-gold.jpg"
   import cardRed from "./assets/mkone/img/card-red.jpg"
   import cardLogo from "./assets/mkone/img/mkone-logo.png"
-  import mkoneLogo from "./assets/mkone/img/mk-one-logo.png"
 
   type Tier = {
     name: "RED" | "BLACK" | "GOLD"
@@ -153,27 +152,23 @@
   const formattedPoints = member.acc_points.toLocaleString("en-US")
   const formattedTarget = tierTarget.toLocaleString("en-US")
   const progress = Math.min((member.acc_points / tierTarget) * 100, 100)
+  const loadedAt = new Date()
+  const qrValue = `W|${member.card_number}|${member.expire_date}|${format(loadedAt, "yyyy-MM-dd HH:mm:ss")}`
 
   let activeTier = 2
-  let now = new Date()
+  let now = loadedAt
   let cardActive = false
 
   $: selectedTier = tiers[activeTier]
   $: today = format(now, "d MMM yyyy")
   $: clock = format(now, "hh:mm:ss a")
-  $: qrValue = `W|${member.card_number}|${member.expire_date}|${format(now, "yyyy-MM-dd HH:mm:ss")}`
 
-  function drawQr(node: HTMLCanvasElement, value: string) {
-    const render = (nextValue: string) => {
-      void QRCode.toCanvas(node, nextValue, {
-        errorCorrectionLevel: "H",
-        margin: 0,
-        width: 86,
-      })
-    }
-
-    render(value)
-    return { update: render }
+  function drawQr(node: HTMLCanvasElement) {
+    void QRCode.toCanvas(node, qrValue, {
+      errorCorrectionLevel: "H",
+      margin: 0,
+      width: 256,
+    })
   }
 
   function tiltCard(event: PointerEvent) {
@@ -218,7 +213,7 @@
 <div class="app-shell" style:--app-background={`url(${background})`}>
   <header class="header">
     <div class="header-inner">
-      <img src={mkoneLogo} alt="MKONE" />
+      <img src={cardLogo} alt="MKONE" />
     </div>
   </header>
 
@@ -274,10 +269,10 @@
                   <div
                     class="qr-inner"
                     role="img"
-                    aria-label="Live membership QR code"
+                    aria-label="Membership QR code"
                   >
                     <canvas
-                      use:drawQr={qrValue}
+                      use:drawQr
                       aria-hidden="true"
                     ></canvas>
                     <div class="qr-logo" aria-hidden="true">

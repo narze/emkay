@@ -299,6 +299,7 @@ h2 {
 
 .qr-box {
   display: flex;
+  width: 100%;
   padding: 4px;
   margin-bottom: 4px;
   align-items: center;
@@ -309,18 +310,21 @@ h2 {
 
 .qr-inner {
   position: relative;
+  width: 100%;
   line-height: 0;
 }
 
 .qr-inner canvas {
-  width: 86px !important;
-  height: 86px !important;
+  width: 100% !important;
+  height: auto !important;
 }
 
 .qr-logo {
   position: absolute;
   top: 50%;
   left: 50%;
+  width: 40%;
+  max-width: 72px;
   padding: 2px 3px;
   border-radius: 2px;
   background: #fff;
@@ -328,7 +332,7 @@ h2 {
 }
 
 .qr-logo img {
-  width: 34px;
+  width: 100%;
 }
 
 .info-pill {
@@ -620,15 +624,6 @@ h2 {
 
   .points-heading strong {
     font-size: 18px;
-  }
-
-  .qr-inner canvas {
-    width: 76px !important;
-    height: 76px !important;
-  }
-
-  .qr-logo img {
-    width: 30px;
   }
 
   .info-pill {
