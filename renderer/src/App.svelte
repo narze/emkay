@@ -174,11 +174,17 @@
   $: today = format(now, "d MMM yyyy")
   $: clock = format(now, "hh:mm:ss a")
 
-  function drawQr(node: HTMLCanvasElement) {
-    void QRCode.toCanvas(node, qrValue, {
-      errorCorrectionLevel: "H",
-      margin: 0,
-      width: 256,
+  // The MKONE app renders the payload as an SVG at error correction level M
+  // with a one module quiet zone. Its encoder puts the whole payload in one
+  // byte segment, so forcing byte mode keeps the grid at 33x33 like the app;
+  // letting qrcode split out the numeric runs would shrink it to 29x29.
+  function drawQr(node: HTMLElement) {
+    void QRCode.toString([{ data: qrValue, mode: "byte" }], {
+      type: "svg",
+      errorCorrectionLevel: "M",
+      margin: 1,
+    }).then((svg) => {
+      node.innerHTML = svg
     })
   }
 
@@ -304,10 +310,7 @@
                     role="img"
                     aria-label="Membership QR code"
                   >
-                    <canvas
-                      use:drawQr
-                      aria-hidden="true"
-                    ></canvas>
+                    <div class="qr-svg" use:drawQr aria-hidden="true"></div>
                     <div class="qr-logo" aria-hidden="true">
                       <img src={cardLogo} alt="" />
                     </div>

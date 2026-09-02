@@ -342,9 +342,10 @@ h2 {
   line-height: 0;
 }
 
-.qr-inner canvas {
-  width: 100% !important;
-  height: auto !important;
+.qr-inner svg {
+  display: block;
+  width: 100%;
+  height: auto;
 }
 
 .qr-logo {
