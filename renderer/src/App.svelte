@@ -184,18 +184,20 @@
   $: today = format(now, "d MMM yyyy")
   $: clock = format(now, "hh:mm:ss a")
 
-  // The MKONE app renders the payload as an SVG at error correction level M
-  // with a one module quiet zone. Its encoder puts the whole payload in one
-  // byte segment, so forcing byte mode keeps the grid at 33x33 like the app;
-  // letting qrcode split out the numeric runs would shrink it to 29x29.
+  // Tuned for scanning at the size the card actually shows it. Letting qrcode
+  // split the numeric runs into their own segments drops the payload from a
+  // 33x33 grid to 29x29, so each module is 13% wider, and level Q then fits in
+  // the same grid while raising error correction from 15% to 25%. Measured
+  // against the alternatives, this decodes at the smallest rendered size, both
+  // clean and blurred. The MKONE app itself uses one byte segment at level M.
   function drawQr(node: HTMLElement, value: string) {
     let latest = value
 
     const render = (next: string) => {
       latest = next
-      void QRCode.toString([{ data: next, mode: "byte" }], {
+      void QRCode.toString(next, {
         type: "svg",
-        errorCorrectionLevel: "M",
+        errorCorrectionLevel: "Q",
         margin: 1,
       }).then((svg) => {
         // A slower render must not overwrite a newer code.
