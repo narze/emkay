@@ -161,19 +161,22 @@
   const memberTier = tiers[memberTierId - 1]
 
   const loadedAt = new Date()
-  const qrValue = buildQrValue({
-    cardNumber: member.card_number,
-    tierId: memberTierId,
-    expireDate: member.expire_date,
-    at: loadedAt,
-  })
+  // How often the QR is reissued with a fresh timestamp.
+  const qrLifetime = 10_000
 
   let activeTier = memberTierId - 1
   let now = loadedAt
+  let qrAt = loadedAt
   let cardActive = false
   let scrolled = false
   let panelHeights: number[] = []
 
+  $: qrValue = buildQrValue({
+    cardNumber: member.card_number,
+    tierId: memberTierId,
+    expireDate: member.expire_date,
+    at: qrAt,
+  })
   $: selectedTier = tiers[activeTier]
   // The viewport takes the height of the tier on show, so the page below it
   // does not jump as the track slides between tiers of different lengths.
@@ -185,14 +188,24 @@
   // with a one module quiet zone. Its encoder puts the whole payload in one
   // byte segment, so forcing byte mode keeps the grid at 33x33 like the app;
   // letting qrcode split out the numeric runs would shrink it to 29x29.
-  function drawQr(node: HTMLElement) {
-    void QRCode.toString([{ data: qrValue, mode: "byte" }], {
-      type: "svg",
-      errorCorrectionLevel: "M",
-      margin: 1,
-    }).then((svg) => {
-      node.innerHTML = svg
-    })
+  function drawQr(node: HTMLElement, value: string) {
+    let latest = value
+
+    const render = (next: string) => {
+      latest = next
+      void QRCode.toString([{ data: next, mode: "byte" }], {
+        type: "svg",
+        errorCorrectionLevel: "M",
+        margin: 1,
+      }).then((svg) => {
+        // A slower render must not overwrite a newer code.
+        if (next === latest) node.innerHTML = svg
+      })
+    }
+
+    render(value)
+
+    return { update: render }
   }
 
   function tiltCard(event: PointerEvent) {
@@ -234,6 +247,10 @@
       now = new Date()
     }, 1_000)
 
+    const qrTimer = window.setInterval(() => {
+      qrAt = new Date()
+    }, qrLifetime)
+
     const trackScroll = () => {
       scrolled = window.scrollY > 25
     }
@@ -243,6 +260,7 @@
 
     return () => {
       window.clearInterval(timer)
+      window.clearInterval(qrTimer)
       window.removeEventListener("scroll", trackScroll)
     }
   })
@@ -317,7 +335,7 @@
                     role="img"
                     aria-label="Membership QR code"
                   >
-                    <div class="qr-svg" use:drawQr aria-hidden="true"></div>
+                    <div class="qr-svg" use:drawQr={qrValue} aria-hidden="true"></div>
                     <div class="qr-logo" aria-hidden="true">
                       <img src={cardLogo} alt="" />
                     </div>
