@@ -184,18 +184,17 @@
   $: today = format(now, "d MMM yyyy")
   $: clock = format(now, "hh:mm:ss a")
 
-  // Tuned for scanning at the size the card actually shows it. Letting qrcode
-  // split the numeric runs into their own segments drops the payload from a
-  // 33x33 grid to 29x29, so each module is 13% wider, and level Q then fits in
-  // the same grid while raising error correction from 15% to 25%. Measured
-  // against the alternatives, this decodes at the smallest rendered size, both
-  // clean and blurred. The MKONE app itself uses one byte segment at level M.
+  // One byte segment, as the MKONE app encodes it, which puts the payload in
+  // version 4 for a 33x33 grid that matches the app's. Level Q rather than the
+  // app's M: it needs the same version, so the grid is identical, but error
+  // correction rises from 15% to 25%. The card renders this 10% larger than
+  // the app does to keep the modules big enough to scan.
   function drawQr(node: HTMLElement, value: string) {
     let latest = value
 
     const render = (next: string) => {
       latest = next
-      void QRCode.toString(next, {
+      void QRCode.toString([{ data: next, mode: "byte" }], {
         type: "svg",
         errorCorrectionLevel: "Q",
         margin: 1,

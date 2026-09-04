@@ -322,7 +322,10 @@ h2 {
   right: 0;
   bottom: 0;
   display: flex;
-  width: 33%;
+
+  /* The app uses 33%. The extra 10% buys back the module size lost to the
+     33x33 grid, and the column grows leftward so it stays inside the card. */
+  width: 36.3%;
   margin: 8px;
   flex-direction: column;
   align-items: center;
