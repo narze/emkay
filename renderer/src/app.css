@@ -354,11 +354,15 @@ h2 {
   height: auto;
 }
 
+/* The app draws this at 33%. At that size the logo's soft edges bleed into the
+   surrounding modules when a scanner reads the code small or at an angle, and
+   the decode rate near the limit drops to about half. 25% measures as well as
+   no logo at all. */
 .qr-logo {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 33%;
+  width: 25%;
   aspect-ratio: 3.2 / 1;
   transform: translate(-50%, -50%);
 }
