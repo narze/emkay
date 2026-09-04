@@ -163,6 +163,10 @@
   const loadedAt = new Date()
   // How often the QR is reissued with a fresh timestamp.
   const qrLifetime = 10_000
+  // The MK ONE mark over the middle of the QR costs a little scan reliability,
+  // since its edges bleed into the surrounding modules when a scanner reads the
+  // code small or at an angle. Set to false to bring the mark back.
+  const hideQrLogo = true
 
   let activeTier = memberTierId - 1
   let now = loadedAt
@@ -337,9 +341,11 @@
                     aria-label="Membership QR code"
                   >
                     <div class="qr-svg" use:drawQr={qrValue} aria-hidden="true"></div>
-                    <div class="qr-logo" aria-hidden="true">
-                      <img src={cardLogo} alt="" />
-                    </div>
+                    {#if !hideQrLogo}
+                      <div class="qr-logo" aria-hidden="true">
+                        <img src={cardLogo} alt="" />
+                      </div>
+                    {/if}
                   </div>
                 </div>
 
