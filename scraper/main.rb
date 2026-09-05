@@ -3,6 +3,10 @@ Bundler.require
 
 require 'date'
 
+# The MKONE card number. The old MK site still reports the legacy card
+# number, so the scraper writes this fixed value instead of the scraped one.
+MKONE_CARD_NUMBER = '1126082006025800'
+
 def login!(page)
   puts 'Open login page'
   page.goto('https://www.thisismymk.com/th/login')
@@ -24,12 +28,12 @@ end
 
 def get_card_data(page)
   name = page.query_selector('.card-body h4').inner_text
-  card_number, expire_date, today_points, redeemable_points = page.query_selector_all('.detail-profile .txt-red').map(&:inner_text).map(&:strip)
+  _legacy_card_number, expire_date, today_points, redeemable_points = page.query_selector_all('.detail-profile .txt-red').map(&:inner_text).map(&:strip)
   acc_points = page.get_by_text("คะแนนปรับระดับสะสม").locator(".txt-red").first.inner_text
 
   {
     name:,
-    card_number:,
+    card_number: MKONE_CARD_NUMBER,
     expire_date: Date.parse(expire_date),
     today_points: today_points.gsub(',', '').to_i,
     redeemable_points: redeemable_points.gsub(',', '').to_i,
