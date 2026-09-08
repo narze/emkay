@@ -168,6 +168,16 @@
   // code small or at an angle. Set to false to bring the mark back.
   const hideQrLogo = true
 
+  // The how-to guide of issue #5. It shows once a day, so a member who already
+  // knows the flow is not interrupted on every visit.
+  const motdKey = "emkay-motd"
+  const motdDelay = 1_000
+  const motdMessage = [
+    "วิธีใช้งาน",
+    "1. โชว์ QR Code ให้พนักงานสแกน",
+    "2. รับส่วนลด",
+  ].join("\n")
+
   let activeTier = memberTierId - 1
   let now = loadedAt
   let qrAt = loadedAt
@@ -247,7 +257,26 @@
     card.style.removeProperty("--glow-y")
   }
 
+  function showMotd() {
+    const today = new Date().toDateString()
+
+    // A browser that blocks storage would show the guide on every load, which
+    // is worse than never showing it, so treat that as already seen.
+    try {
+      if (window.localStorage.getItem(motdKey) === today) return 0
+      window.localStorage.setItem(motdKey, today)
+    } catch {
+      return 0
+    }
+
+    // Let the card and the QR paint first, so the guide describes what the
+    // member already has on screen.
+    return window.setTimeout(() => window.alert(motdMessage), motdDelay)
+  }
+
   onMount(() => {
+    const motdTimer = showMotd()
+
     const timer = window.setInterval(() => {
       now = new Date()
     }, 1_000)
@@ -264,6 +293,7 @@
     window.addEventListener("scroll", trackScroll, { passive: true })
 
     return () => {
+      window.clearTimeout(motdTimer)
       window.clearInterval(timer)
       window.clearInterval(qrTimer)
       window.removeEventListener("scroll", trackScroll)
