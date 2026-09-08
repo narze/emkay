@@ -53,7 +53,7 @@ def write_to_file(card_data)
   end
 end
 
-Playwright.create(playwright_cli_executable_path: 'npx playwright@1.52.0') do |playwright|
+Playwright.create(playwright_cli_executable_path: 'npx playwright@1.62.0') do |playwright|
 # Playwright.create(playwright_cli_executable_path: 'npx playwright') do |playwright|
   playwright.chromium.launch(headless: ENV.has_key?("CI")) do |browser|
     context = browser.new_context # Prepare new window.
