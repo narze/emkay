@@ -178,12 +178,29 @@
     "2. รับส่วนลด",
   ].join("\n")
 
+  // iOS has no install prompt, so the banner there explains the Share menu
+  // steps instead.
+  const iosInstallMessage = [
+    "เพิ่ม MKONE ลงหน้าจอหลัก",
+    "1. แตะปุ่ม 'แชร์' (Share) ที่ด้านล่างของหน้าจอ",
+    "2. เลื่อนลงและแตะ 'เพิ่มไปยังหน้าจอโฮม' (Add to Home Screen)",
+    "3. แตะ 'เพิ่ม' (Add) ที่มุมบนขวา",
+  ].join("\n")
+
+  type InstallPromptEvent = Event & {
+    prompt: () => Promise<void>
+    userChoice: Promise<{ outcome: "accepted" | "dismissed" }>
+  }
+
   let activeTier = memberTierId - 1
   let now = loadedAt
   let qrAt = loadedAt
   let cardActive = false
   let scrolled = false
   let panelHeights: number[] = []
+  let showInstall = false
+  let isIOS = false
+  let installPrompt: InstallPromptEvent | null = null
 
   $: qrValue = buildQrValue({
     cardNumber: member.card_number,
@@ -274,8 +291,58 @@
     return window.setTimeout(() => window.alert(motdMessage), motdDelay)
   }
 
+  function isStandalone() {
+    return (
+      window.matchMedia("(display-mode: standalone)").matches ||
+      // Safari on iOS reports a home screen launch here instead.
+      (navigator as Navigator & { standalone?: boolean }).standalone === true
+    )
+  }
+
+  function detectIOS() {
+    // iPadOS asks for the desktop site, so it reports itself as a Mac with touch.
+    return (
+      /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+      (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1)
+    )
+  }
+
+  async function installApp() {
+    if (installPrompt) {
+      const event = installPrompt
+      installPrompt = null
+      showInstall = false
+      await event.prompt()
+      await event.userChoice
+      return
+    }
+
+    window.alert(iosInstallMessage)
+  }
+
   onMount(() => {
     const motdTimer = showMotd()
+
+    const standalone = isStandalone()
+    isIOS = detectIOS()
+    // Safari on iOS never fires beforeinstallprompt, so show the steps there
+    // right away.
+    if (!standalone && isIOS) showInstall = true
+
+    const captureInstallPrompt = (event: Event) => {
+      event.preventDefault()
+      if (standalone) return
+      installPrompt = event as InstallPromptEvent
+      showInstall = true
+    }
+
+    const hideInstall = () => {
+      installPrompt = null
+      showInstall = false
+    }
+
+    window.addEventListener("beforeinstallprompt", captureInstallPrompt)
+    window.addEventListener("appinstalled", hideInstall)
 
     const timer = window.setInterval(() => {
       now = new Date()
@@ -297,6 +364,8 @@
       window.clearInterval(timer)
       window.clearInterval(qrTimer)
       window.removeEventListener("scroll", trackScroll)
+      window.removeEventListener("beforeinstallprompt", captureInstallPrompt)
+      window.removeEventListener("appinstalled", hideInstall)
     }
   })
 </script>
@@ -470,6 +539,31 @@
       </section>
     </div>
   </main>
+
+  {#if showInstall}
+    <aside class="install-banner" aria-label="Add to home screen">
+      <div class="install-inner">
+        <img src="/icons/mkone-192.png" alt="" />
+        <div class="install-text">
+          <strong>เพิ่มลงหน้าจอหลัก</strong>
+          <p>เปิดบัตรสมาชิกได้เร็วขึ้น</p>
+        </div>
+        <button type="button" class="install-action" onclick={installApp}>
+          {isIOS ? "วิธีการเพิ่ม" : "เพิ่มเลย"}
+        </button>
+        <button
+          type="button"
+          class="install-close"
+          aria-label="Close"
+          onclick={() => (showInstall = false)}
+        >
+          <svg viewBox="0 0 14 14" aria-hidden="true">
+            <path d="M1 1L13 13M13 1L1 13" />
+          </svg>
+        </button>
+      </div>
+    </aside>
+  {/if}
 
   <nav class="bottom-nav" aria-label="Primary navigation">
     <div class="nav-inner">
