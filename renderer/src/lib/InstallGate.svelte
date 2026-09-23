@@ -92,7 +92,6 @@
       </ol>
     {:else if platform === "ios"}
       <h1>เพิ่ม MKONE ลงหน้าจอโฮม</h1>
-      <p class="gate-lead">บัตรสมาชิกเปิดได้จากไอคอนบนหน้าจอโฮมเท่านั้น</p>
       <ol>
         <li>แตะปุ่ม "แชร์" (Share)</li>
         <li>เลื่อนลงและแตะ "เพิ่มไปยังหน้าจอโฮม" (Add to Home Screen)</li>
@@ -102,7 +101,6 @@
       <p class="gate-note">ถ้าไม่เจอปุ่มแชร์ ให้เปิดหน้านี้ใน Safari</p>
     {:else}
       <h1>ติดตั้ง MKONE</h1>
-      <p class="gate-lead">บัตรสมาชิกเปิดได้จากไอคอนบนหน้าจอโฮมเท่านั้น</p>
       {#if installPrompt}
         <button type="button" class="gate-action" onclick={install}>
           ติดตั้งแอป
