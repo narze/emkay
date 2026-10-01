@@ -1,18 +1,16 @@
 name: Scrape
 
+# Scraping is disabled: points are set manually in scraper/data.json.
+# To re-enable, restore the push/schedule triggers and remove `if: false` below.
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
-  schedule:
-    - cron: "0 6 * * *" # 13:00 Asia/Bangkok (UTC+7)
 
 permissions:
   contents: write
 
 jobs:
   build:
+    if: false
     runs-on: ubuntu-latest
 
     defaults:
