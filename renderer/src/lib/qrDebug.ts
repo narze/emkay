@@ -72,6 +72,8 @@ export type Comparison =
       match: boolean
       /** Each field of the scanned payload against the regenerated one. */
       rows: Row[]
+      /** The tier, A and C digits that follow the card number, together. */
+      digits: Row
       /** The scanned card, tier and expiry against what emkay shows. */
       member: Row[]
       /** Seconds the code's timestamp is ahead (+) or behind (-) this device. */
@@ -119,6 +121,11 @@ export function compareQr(raw: string, member: Member, now: Date): Comparison {
       row("Expiry", scanned.expire, ours.expire),
       row("Timestamp", scanned.timestamp, ours.timestamp),
     ],
+    digits: row(
+      "After card",
+      `${scanned.tierId}${scanned.a}${scanned.c}`,
+      `${ours.tierId}${ours.a}${ours.c}`,
+    ),
     member: [
       row("Card", scanned.cardNumber, member.cardNumber),
       row("Tier", scanned.tierId, member.tierId),

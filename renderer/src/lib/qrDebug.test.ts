@@ -47,6 +47,7 @@ describe("compareQr", () => {
   it.each(real)("matches the real app's %s", (raw) => {
     const result = compareQr(raw, member, now)
     expect(result.ok && result.match).toBe(true)
+    expect(result.ok && result.digits).toMatchObject({ scanned: raw.slice(18, 21), ok: true })
     expect(result.ok && result.member.every((row) => row.ok)).toBe(true)
   })
 
@@ -63,6 +64,7 @@ describe("compareQr", () => {
       scanned: "5",
       expected: "4",
     })
+    expect(result.digits).toMatchObject({ scanned: "356", expected: "340", ok: false })
   })
 
   it("points at check digit C alone when only it is off", () => {

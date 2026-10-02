@@ -307,7 +307,8 @@
             <tr><th>Field</th><th>Scanned</th><th>emkay</th><th></th></tr>
           </thead>
           <tbody>
-            {#each result.rows as row}
+            <!-- The digits after the card in one row, then each on its own. -->
+            {#each [result.rows[0], result.digits, ...result.rows.slice(1)] as row}
               <tr class:bad={!row.ok}>
                 <th>{row.label}</th>
                 <td><code>{row.scanned}</code></td>
