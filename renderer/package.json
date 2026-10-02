@@ -13,6 +13,7 @@
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^5.0.3",
     "@tsconfig/svelte": "^5.0.4",
+    "@types/node": "22",
     "canvas-circular-countdown": "^1.8.0",
     "svelte": "^5.28.2",
     "svelte-check": "^4.1.6",
@@ -23,6 +24,7 @@
   },
   "dependencies": {
     "date-fns": "^4.1.0",
-    "qrcode": "^1.5.4"
+    "qrcode": "^1.5.4",
+    "zxing-wasm": "^3.1.4"
   }
 }

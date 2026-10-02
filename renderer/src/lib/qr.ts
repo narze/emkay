@@ -41,6 +41,18 @@ export function verhoeff(digits: string): number {
   return INV[c]
 }
 
+/** The second check digit: A multiplied by 1 in the Verhoeff D5 group. */
+export function secondCheckDigit(a: number): number {
+  return D[1][a]
+}
+
+/** The yyyyMMddHHmmss timestamp of a payload as a local Date. */
+export function parseTimestamp(timestamp: string): Date {
+  const part = (start: number, length = 2) =>
+    Number(timestamp.slice(start, start + length))
+  return new Date(part(0, 4), part(4) - 1, part(6), part(8), part(10), part(12))
+}
+
 export type QrInput = {
   /** 16-digit membership card number. */
   cardNumber: string
@@ -64,7 +76,7 @@ export function buildQrValue({ cardNumber, tierId, expireDate, at }: QrInput): s
   const timestamp = format(at, "yyyyMMddHHmmss")
   const expire = expireDate.replaceAll("-", "")
   const a = verhoeff(`${cardNumber}${tierId}${timestamp}`)
-  const c = D[1][a]
+  const c = secondCheckDigit(a)
 
   return `W|${cardNumber}${tierId}${a}${c}|${expire}|${timestamp}`
 }

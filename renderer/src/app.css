@@ -566,6 +566,8 @@ h2 {
 }
 
 .brand-privileges h2 img {
+  /* Quick taps on the MK logo open the debug scanner; no double-tap zoom. */
+  touch-action: manipulation;
   width: 100%;
   height: 100%;
   border-radius: inherit;
