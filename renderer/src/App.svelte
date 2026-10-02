@@ -1,10 +1,11 @@
 <script lang="ts">
   import { onMount } from "svelte"
   import { format } from "date-fns"
-  import QRCode from "qrcode"
 
   import member from "../../scraper/data.json"
   import { buildQrValue } from "./lib/qr"
+  import { drawQr } from "./lib/qrRender"
+  import { secretTaps } from "./lib/secretTaps"
   import background from "./assets/mkone/img/background.jpg"
   import brandHakata from "./assets/mkone/img/brand-hakata.png"
   import brandLaemCharoen from "./assets/mkone/img/brand-laemcharoen.png"
@@ -178,6 +179,11 @@
     "2. รับส่วนลด",
   ].join("\n")
 
+  // Eight quick taps on the MK logo open a scanner that checks the QR of the
+  // real MKONE app against buildQrValue. It loads only when opened.
+  let debugOpen = false
+  const openDebug = () => (debugOpen = true)
+
   let activeTier = memberTierId - 1
   let now = loadedAt
   let qrAt = loadedAt
@@ -197,31 +203,6 @@
   $: panelHeight = panelHeights[activeTier] ?? 0
   $: today = format(now, "d MMM yyyy")
   $: clock = format(now, "hh:mm:ss a")
-
-  // One byte segment, as the MKONE app encodes it, which puts the payload in
-  // version 4 for a 33x33 grid that matches the app's. Level Q rather than the
-  // app's M: it needs the same version, so the grid is identical, but error
-  // correction rises from 15% to 25%. The card renders this 10% larger than
-  // the app does to keep the modules big enough to scan.
-  function drawQr(node: HTMLElement, value: string) {
-    let latest = value
-
-    const render = (next: string) => {
-      latest = next
-      void QRCode.toString([{ data: next, mode: "byte" }], {
-        type: "svg",
-        errorCorrectionLevel: "Q",
-        margin: 1,
-      }).then((svg) => {
-        // A slower render must not overwrite a newer code.
-        if (next === latest) node.innerHTML = svg
-      })
-    }
-
-    render(value)
-
-    return { update: render }
-  }
 
   function tiltCard(event: PointerEvent) {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return
@@ -452,7 +433,11 @@
                       aria-labelledby={`brand-${tierIndex}-${brandIndex}`}
                     >
                       <h2 id={`brand-${tierIndex}-${brandIndex}`}>
-                        <img src={brand.image} alt="" />
+                        <img
+                          src={brand.image}
+                          alt=""
+                          use:secretTaps={brandIndex === 0 ? openDebug : undefined}
+                        />
                         <span class="sr-only">{brand.name}</span>
                       </h2>
                       <ul>
@@ -508,4 +493,17 @@
       </div>
     </div>
   </nav>
+
+  {#if debugOpen}
+    {#await import("./lib/DebugScanner.svelte") then { default: DebugScanner }}
+      <DebugScanner
+        member={{
+          cardNumber: member.card_number,
+          tierId: memberTierId,
+          expireDate: member.expire_date,
+        }}
+        onclose={() => (debugOpen = false)}
+      />
+    {/await}
+  {/if}
 </div>

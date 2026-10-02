@@ -27,9 +27,11 @@ declare module "qrcode" {
     ): Promise<string>
     toCanvas(
       canvas: HTMLCanvasElement,
-      value: string,
+      value: string | Segment[],
       options?: CanvasOptions,
     ): Promise<void>
+    // Node only.
+    toBuffer(value: string | Segment[], options?: CanvasOptions): Promise<Uint8Array>
   }
 
   const QRCode: QRCode
