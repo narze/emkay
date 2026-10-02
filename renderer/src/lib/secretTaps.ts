@@ -17,10 +17,10 @@ export function tapCounter(count: number, maxGapMs: number) {
   }
 }
 
-/** Svelte action: calls `onunlock` after 8 quick taps. Does nothing without it. */
+/** Svelte action: calls `onunlock` after 5 quick taps. Does nothing without it. */
 export function secretTaps(node: HTMLElement, onunlock?: () => void) {
   let unlock = onunlock
-  const tap = tapCounter(8, 800)
+  const tap = tapCounter(5, 800)
 
   const handle = (event: MouseEvent) => {
     if (unlock && tap(event.timeStamp)) unlock()

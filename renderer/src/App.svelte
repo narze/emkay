@@ -179,7 +179,7 @@
     "2. รับส่วนลด",
   ].join("\n")
 
-  // Eight quick taps on the MK logo open a scanner that checks the QR of the
+  // Five quick taps on the MK logo open a scanner that checks the QR of the
   // real MKONE app against buildQrValue. It loads only when opened.
   let debugOpen = false
   const openDebug = () => (debugOpen = true)
