@@ -72,12 +72,12 @@
     <img class="gate-icon" src="/icons/mkone-192.png" alt="" />
 
     {#if installed}
-      <h1>ติดตั้ง MKONE แล้ว</h1>
-      <p class="gate-lead">เปิด MKONE จากไอคอนบนหน้าจอโฮมเพื่อใช้บัตรสมาชิก</p>
+      <h1>ติดตั้ง Emkay แล้ว</h1>
+      <p class="gate-lead">เปิด Emkay จากไอคอนบนหน้าจอโฮมเพื่อใช้บัตรสมาชิก</p>
     {:else if inApp}
       <h1>เปิดในเบราว์เซอร์</h1>
       <p class="gate-lead">
-        แอปแชทเพิ่ม MKONE ลงหน้าจอโฮมไม่ได้ ให้เปิดหน้านี้ใน{platform === "ios"
+        แอปแชทเพิ่ม Emkay ลงหน้าจอโฮมไม่ได้ ให้เปิดหน้านี้ใน{platform === "ios"
           ? " Safari "
           : " Chrome "}ก่อน
       </p>
@@ -91,16 +91,16 @@
         <li>เลือก "เปิดในเบราว์เซอร์" (Open in browser)</li>
       </ol>
     {:else if platform === "ios"}
-      <h1>เพิ่ม MKONE ลงหน้าจอโฮม</h1>
+      <h1>เพิ่ม Emkay ลงหน้าจอโฮม</h1>
       <ol>
         <li>แตะปุ่ม "แชร์" (Share)</li>
         <li>เลื่อนลงและแตะ "เพิ่มไปยังหน้าจอโฮม" (Add to Home Screen)</li>
         <li>แตะ "เพิ่ม" (Add) ที่มุมบนขวา</li>
-        <li>เปิด MKONE จากไอคอนบนหน้าจอโฮม</li>
+        <li>เปิด Emkay จากไอคอนบนหน้าจอโฮม</li>
       </ol>
       <p class="gate-note">ถ้าไม่เจอปุ่มแชร์ ให้เปิดหน้านี้ใน Safari</p>
     {:else}
-      <h1>ติดตั้ง MKONE</h1>
+      <h1>ติดตั้ง Emkay</h1>
       {#if installPrompt}
         <button type="button" class="gate-action" onclick={install}>
           ติดตั้งแอป
@@ -109,7 +109,7 @@
         <ol>
           <li>แตะเมนู (⋮) ของเบราว์เซอร์</li>
           <li>เลือก "ติดตั้งแอป" หรือ "เพิ่มลงในหน้าจอหลัก"</li>
-          <li>เปิด MKONE จากไอคอนบนหน้าจอโฮม</li>
+          <li>เปิด Emkay จากไอคอนบนหน้าจอโฮม</li>
         </ol>
       {/if}
     {/if}
