@@ -35,15 +35,16 @@ Gotchas:
 
 ## 2. Apply the update
 
-Run the helper from the repo root (it keeps the file's exact formatting — 2-space indent,
-Thai text unescaped, no trailing newline):
+Run the helper from the repo root. It keeps the file's exact formatting (2-space indent, Thai
+text unescaped, no trailing newline), refuses to run if the file isn't in that format, and
+changes only `acc_points` and `updated_at`:
 
 ```bash
-python3 .claude/skills/update-points/update_points.py \
+node .claude/skills/update-points/update_points.mjs \
   --points 11412 --updated "27 ก.ย. 69, 08:24"
 ```
 
-Exit code `3` means the file already holds these values: report "already up to date" and
+Exit code `1` means bad input or an unexpected file format: stop and report it. Exit code `3` means the file already holds these values: report "already up to date" and
 make no commit.
 
 ## 3. Commit directly to main
