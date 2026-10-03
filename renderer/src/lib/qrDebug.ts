@@ -81,6 +81,15 @@ export type Comparison =
     }
   | { ok: false; raw: string; reason: string }
 
+// tier_id of a card in the MKONE API.
+const tierNames: Record<number, string> = { 1: "RED", 2: "BLACK", 3: "GOLD" }
+
+/** "3 (GOLD)", or just the id for a tier emkay does not know. */
+export function describeTier(tierId: number): string {
+  const name = tierNames[tierId]
+  return name ? `${tierId} (${name})` : String(tierId)
+}
+
 function hyphenate(yyyymmdd: string): string {
   return `${yyyymmdd.slice(0, 4)}-${yyyymmdd.slice(4, 6)}-${yyyymmdd.slice(6, 8)}`
 }
@@ -115,7 +124,7 @@ export function compareQr(raw: string, member: Member, now: Date): Comparison {
     match: raw === regenerated,
     rows: [
       row("Card", scanned.cardNumber, ours.cardNumber),
-      row("Tier", scanned.tierId, ours.tierId),
+      row("Tier", describeTier(scanned.tierId), describeTier(ours.tierId)),
       row("Check A", scanned.a, ours.a),
       row("Check C", scanned.c, ours.c),
       row("Expiry", scanned.expire, ours.expire),
@@ -128,7 +137,7 @@ export function compareQr(raw: string, member: Member, now: Date): Comparison {
     ),
     member: [
       row("Card", scanned.cardNumber, member.cardNumber),
-      row("Tier", scanned.tierId, member.tierId),
+      row("Tier", describeTier(scanned.tierId), describeTier(member.tierId)),
       row("Expiry", hyphenate(scanned.expire), member.expireDate),
     ],
     skewSeconds: Math.round((at.getTime() - now.getTime()) / 1000),

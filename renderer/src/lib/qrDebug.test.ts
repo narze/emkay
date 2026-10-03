@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 
-import { compareQr, parseQrValue, toTestSamples } from "./qrDebug"
+import { compareQr, describeTier, parseQrValue, toTestSamples } from "./qrDebug"
 
 const member = { cardNumber: "1126082006025800", tierId: 3, expireDate: "2026-12-31" }
 const now = new Date(2026, 8, 2, 23, 24, 10)
@@ -86,9 +86,29 @@ describe("compareQr", () => {
     ])
   })
 
+  it("names the tier in the tier rows", () => {
+    const result = compareQr("W|1126082006025800200|20271231|20260902224627", member, now)
+    if (!result.ok) throw new Error(result.reason)
+    expect(result.rows.find((row) => row.label === "Tier")).toMatchObject({
+      scanned: "2 (BLACK)",
+      expected: "2 (BLACK)",
+    })
+    expect(result.member.find((row) => row.label === "Tier")).toMatchObject({
+      scanned: "2 (BLACK)",
+      expected: "3 (GOLD)",
+      ok: false,
+    })
+  })
+
   it("reports how far the code's clock is from this device", () => {
     const result = compareQr(real[3], member, new Date(2026, 8, 2, 23, 24, 25))
     expect(result.ok && result.skewSeconds).toBe(-15)
+  })
+})
+
+describe("describeTier", () => {
+  it("names the known tiers and leaves others as the id", () => {
+    expect([1, 2, 3, 9].map(describeTier)).toEqual(["1 (RED)", "2 (BLACK)", "3 (GOLD)", "9"])
   })
 })
 
