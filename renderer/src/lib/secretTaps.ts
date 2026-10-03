@@ -23,8 +23,16 @@ export function secretTaps(node: HTMLElement, onunlock?: () => void) {
   const tap = tapCounter(5, 800)
 
   const handle = (event: MouseEvent) => {
-    if (unlock && tap(event.timeStamp)) unlock()
+    if (!unlock || !tap(event.timeStamp)) return
+
+    // A small bounce on the logo tells the tapper the debug mode took.
+    node.classList.remove("debug-bounce")
+    void node.offsetWidth // restart the animation if it is still running
+    node.classList.add("debug-bounce")
+    unlock()
   }
+  const settle = () => node.classList.remove("debug-bounce")
+  node.addEventListener("animationend", settle)
   node.addEventListener("click", handle)
 
   return {
@@ -33,6 +41,7 @@ export function secretTaps(node: HTMLElement, onunlock?: () => void) {
     },
     destroy() {
       node.removeEventListener("click", handle)
+      node.removeEventListener("animationend", settle)
     },
   }
 }
