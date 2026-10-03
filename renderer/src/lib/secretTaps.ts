@@ -23,8 +23,17 @@ export function secretTaps(node: HTMLElement, onunlock?: () => void) {
   const tap = tapCounter(5, 800)
 
   const handle = (event: MouseEvent) => {
-    if (unlock && tap(event.timeStamp)) unlock()
+    if (!unlock) return
+
+    // Every tap bounces the logo a little, so the tapper sees each one land.
+    node.classList.remove("debug-bounce")
+    void node.offsetWidth // restart the animation if it is still running
+    node.classList.add("debug-bounce")
+
+    if (tap(event.timeStamp)) unlock()
   }
+  const settle = () => node.classList.remove("debug-bounce")
+  node.addEventListener("animationend", settle)
   node.addEventListener("click", handle)
 
   return {
@@ -33,6 +42,7 @@ export function secretTaps(node: HTMLElement, onunlock?: () => void) {
     },
     destroy() {
       node.removeEventListener("click", handle)
+      node.removeEventListener("animationend", settle)
     },
   }
 }
